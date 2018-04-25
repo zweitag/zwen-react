@@ -4,11 +4,13 @@
   "description": "Zweitag Code Generator",
   "main": "index.js",
   "scripts": {
-    "test": "npm test"
+    "test": "npm test",
+    "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
   },
   "author": "Alex Kott",
   "license": "ISC",
-  "dependencies": {
-    "doxdox": "^2.0.3"
+  "devDependencies": {
+    "jsdoc": "^3.5.5",
+    "minami": "^1.2.3"
   }
 }
