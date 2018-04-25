@@ -1,14 +1,21 @@
 {
   "name": "zwen",
-  "version": "1.0.0",
-  "description": "Zweitag Code Generator",
-  "main": "index.js",
+  "version": "0.0.1",
+  "description": "Zweitag generator for react/redux projects",
+  "keywords": [
+    "zweitag",
+    "react",
+    "redux",
+    "generator",
+    "cli",
+    "architecture"
+  ],
   "scripts": {
     "test": "npm test",
     "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
   },
   "author": "Alex Kott",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "jsdoc": "^3.5.5",
     "minami": "^1.2.3"
