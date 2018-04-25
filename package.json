@@ -1,6 +1,10 @@
 {
-  "name": "zwen",
+  "name": "zwen-react",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "github:zweitag/zwen-react"
+  },
   "description": "Zweitag generator for react/redux projects",
   "keywords": [
     "zweitag",
