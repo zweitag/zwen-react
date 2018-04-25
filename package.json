@@ -1,0 +1,14 @@
+{
+  "name": "zwen",
+  "version": "1.0.0",
+  "description": "Zweitag Code Generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Alex Kott",
+  "license": "ISC",
+  "dependencies": {
+    "doxdox": "^2.0.3"
+  }
+}
