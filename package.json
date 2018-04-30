@@ -10,7 +10,10 @@
   "dependencies": {
     "@oclif/command": "1",
     "@oclif/config": "1",
-    "@oclif/plugin-help": "1"
+    "@oclif/plugin-help": "1",
+    "@types/yeoman-generator": "^2.0.3",
+    "yeoman-generator": "^2.0.5",
+    "yeoman-environment": "^2.0.6"
   },
   "devDependencies": {
     "@oclif/dev-cli": "1",
