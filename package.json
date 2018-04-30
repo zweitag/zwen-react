@@ -21,8 +21,6 @@
     "@types/node": "9",
     "chai": "4",
     "globby": "8",
-    "mocha": "5",
-    "nyc": "11",
     "ts-node": "5",
     "tslib": "1",
     "tslint": "5",
@@ -62,9 +60,8 @@
     "postpack": "rm -f .oclif.manifest.json",
     "posttest": "tsc -p test --noEmit && tslint -p test -t stylish",
     "prepack": "rm -rf lib && tsc && oclif-dev manifest && oclif-dev readme",
-    "test_mocha": "nyc mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md",
-    "test": "npm test",
+    "test": "echo NO TESTS",
     "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
   },
   "types": "lib/index.d.ts"
