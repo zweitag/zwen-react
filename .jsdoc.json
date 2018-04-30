@@ -4,7 +4,7 @@
         "dictionaries": ["jsdoc"]
     },
     "source": {
-        "include": ["README.md", "templates"],
+        "include": ["README.md", "zwen-cli/templates"],
         "includePattern": ".js$",
         "excludePattern": "(node_modules/|docs)"
     },
