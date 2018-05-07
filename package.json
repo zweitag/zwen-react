@@ -1,12 +1,47 @@
 {
-  "name": "zwen-react",
+  "name": "zwen",
+  "description": "zwen is a code generator CLI for projects using react and redux",
   "version": "0.0.1",
-  "repository": {
-    "type": "git",
-    "url": "github:zweitag/zwen-react"
+  "author": "Zweitag GmbH @zweitag",
+  "bin": {
+    "zwen": "./bin/run"
   },
-  "description": "Zweitag generator for react/redux projects",
+  "bugs": "https://github.com/https://github.com/zweitag/zwen-react/issues",
+  "dependencies": {
+    "@oclif/command": "1",
+    "@oclif/config": "1",
+    "@oclif/plugin-help": "1",
+    "@types/yeoman-generator": "^2.0.3",
+    "yeoman-generator": "^2.0.5",
+    "yeoman-environment": "^2.0.6"
+  },
+  "devDependencies": {
+    "@oclif/dev-cli": "1",
+    "@oclif/test": "1",
+    "@oclif/tslint": "1",
+    "@types/chai": "4",
+    "@types/mocha": "5",
+    "@types/node": "9",
+    "chai": "4",
+    "globby": "8",
+    "ts-node": "5",
+    "tslib": "1",
+    "tslint": "5",
+    "typescript": "2.8",
+    "jsdoc": "^3.5.5",
+    "minami": "^1.2.3"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/.oclif.manifest.json",
+    "/bin",
+    "/lib"
+  ],
+  "homepage": "https://github.com/https://github.com/zweitag/zwen-react",
   "keywords": [
+    "oclif",
     "zweitag",
     "react",
     "redux",
@@ -14,14 +49,23 @@
     "cli",
     "architecture"
   ],
+  "license": "MIT",
+  "main": "lib/index.js",
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "zwen",
+    "plugins": [
+      "@oclif/plugin-help"
+    ]
+  },
+  "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
-    "test": "npm test",
+    "postpack": "rm -f .oclif.manifest.json",
+    "posttest": "tsc -p test --noEmit && tslint -p test -t stylish",
+    "prepack": "rm -rf lib && tsc && oclif-dev manifest && oclif-dev readme",
+    "version": "oclif-dev readme && git add README.md",
+    "test": "echo NO TESTS",
     "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
   },
-  "author": "Alex Kott",
-  "license": "MIT",
-  "devDependencies": {
-    "jsdoc": "^3.5.5",
-    "minami": "^1.2.3"
-  }
+  "types": "lib/index.d.ts"
 }
