@@ -8,8 +8,8 @@ currently working on a first version which will include generation of:
 * constants
 * helpers
 * middleware
-* [reducers](docs/reducers.md)
-* [selectors](docs/selectors.md])
+* [reducers](docs/reducer.md)
+* [selectors](docs/selector.md])
 
 Later versions will also include generation of barebones project architecture,
 webpack setup and addition of frequently used things like forms or loaders.

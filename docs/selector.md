@@ -2,7 +2,7 @@
 
 We always use selectors to access the state. That way we can refactor the
 reducer structure without having to change every single component. Selectors
-are written inside the respective [reducer](/reducer.md) file.
+are written inside the respective [reducer](reducer.md) file.
 
 ```
 // => reducers/myFeature/myReducer.js
