@@ -27,9 +27,7 @@
     "ts-node": "5",
     "tslib": "1",
     "tslint": "5",
-    "typescript": "2.8",
-    "jsdoc": "^3.5.5",
-    "minami": "^1.2.3"
+    "typescript": "2.8"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -64,8 +62,7 @@
     "posttest": "tsc -p test --noEmit && tslint -p test -t stylish",
     "prepack": "rm -rf lib && tsc && oclif-dev manifest && oclif-dev readme",
     "version": "oclif-dev readme && git add README.md",
-    "test": "echo NO TESTS",
-    "docs": "node_modules/.bin/jsdoc --configure .jsdoc.json --verbose"
+    "test": "echo NO TESTS"
   },
   "types": "lib/index.d.ts"
 }
