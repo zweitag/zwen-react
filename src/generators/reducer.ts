@@ -8,8 +8,14 @@ class ReducerGenerator extends Generator {
   writing() {
     this.fs.copyTpl(
       this.templatePath('reducer.ejs'),
-      this.destinationPath('public/test_reducer.js'),
-      {REDUCER_NAME: 'test123'}
+      this.destinationPath(`src/reducer/${this.options.path}/${this.options.filename}.js`),
+      {}
+    )
+
+    this.fs.copyTpl(
+      this.templatePath('reducerIndex.ejs'),
+      this.destinationPath(`src/reducer/${this.options.path}/index.js`),
+      {REDUCER_NAME: this.options.filename}
     )
   }
 
