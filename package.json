@@ -11,6 +11,8 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2",
+    "@types/camelcase": "^4.1.0",
+    "camelcase": "^5.0.0",
     "tslib": "^1",
     "yeoman-environment": "^2.2.0",
     "yeoman-generator": "^2.0.5"
