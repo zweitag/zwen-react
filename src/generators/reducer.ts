@@ -3,7 +3,6 @@ const camelCase = require('camelcase');
 
 import { GeneratorOptions } from '../types';
 
-
 class ReducerGenerator extends Generator {
   options!: GeneratorOptions;
 
@@ -12,27 +11,33 @@ class ReducerGenerator extends Generator {
   }
 
   writing() {
+    const pathPrefix = 'reducer';
     const { path, fileName } = this.options;
     const filePath = path.split('/');
     filePath.push(fileName);
     const selectorNameArr = ['get', ...filePath];
 
     this.fs.copyTpl(
-      this.templatePath('reducer.ejs'),
-      this.destinationPath(`src/reducer/${filePath.join('/')}.js`),
+      this.templatePath(`${pathPrefix}/file.ejs`),
+      this.destinationPath(`src/${pathPrefix}/${filePath.join('/')}.js`),
       {
         STATE_PATH: filePath.join('.'),
         SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
       }
     );
-
-    this.fs.copyTpl(
-      this.templatePath('reducerIndex.ejs'),
-      this.destinationPath(`src/reducer/${path}/index.js`),
-      {
-        REDUCER_NAME: fileName,
+    let currentPath = '/';
+    filePath.forEach(subPath => {
+      if (!this.fs.exists(`${pathPrefix}${currentPath}index.js`)) {
+        this.fs.copyTpl(
+          this.templatePath(`${pathPrefix}/index.ejs`),
+          this.destinationPath(`src/${pathPrefix}${currentPath}index.js`),
+          {
+            REDUCER_NAME: subPath,
+          }
+        );
       }
-    );
+      currentPath += `${subPath}/`;
+    });
   }
 
   logging() {
