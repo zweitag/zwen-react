@@ -3,8 +3,8 @@
 *zwen-react* is a code generator CLI for projects using react and redux. We are
 currently working on a first version which will include generation of:
 
-* actions
-* components
+* [actions](docs/action.md)
+* [components](docs/component.md)
 * constants
 * helpers
 * middleware
