@@ -10,19 +10,19 @@ class ReducerGenerator extends Generator {
       this.templatePath('reducer.ejs'),
       this.destinationPath(`src/reducer/${this.options.path}/${this.options.filename}.js`),
       {}
-    )
+    );
 
     this.fs.copyTpl(
       this.templatePath('reducerIndex.ejs'),
       this.destinationPath(`src/reducer/${this.options.path}/index.js`),
-      {REDUCER_NAME: this.options.filename}
-    )
+      { REDUCER_NAME: this.options.filename }
+    );
   }
 
   logging() {
-    this.log('Destination Root: ' + this.destinationRoot())
-    this.log('Template Root: ' + this.sourceRoot())
+    this.log('Destination Root: ' + this.destinationRoot());
+    this.log('Template Root: ' + this.sourceRoot());
   }
 }
 
-export = ReducerGenerator
+export = ReducerGenerator;
