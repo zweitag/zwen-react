@@ -25,6 +25,19 @@ class ReducerGenerator extends Generator {
         SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
       }
     );
+
+    this.fs.copyTpl(
+      this.templatePath(`${pathPrefix}/test.ejs`),
+      this.destinationPath(`src/${pathPrefix}/${filePath.join('/')}.test.js`),
+      {
+        REDUCER_NAME: fileName,
+        REDUCER_PATH: filePath.join('/'),
+        STATE_PARTS: filePath,
+        STATE_PATH: filePath.join('.'),
+        SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
+      }
+    );
+
     let currentPath = `src/${pathPrefix}/`;
     filePath.forEach(subPath => {
       if (!this.fs.exists(`${currentPath}index.js`)) {

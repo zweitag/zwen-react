@@ -1,0 +1,36 @@
+import * as t from '@/actions/types';
+
+import reducer, * as selectors from './<%=REDUCER_NAME%>';
+
+describe('reducers/<%=REDUCER_PATH%>', () => {
+  it('should return the state if no action matches', () => {
+    const mockAction = {
+      type: 'test/TEST_ACTION',
+    };
+    const mockState = {
+      test: true,
+    };
+
+    const state = reducer(mockState, mockAction);
+    expect(state).toHaveProperty('test', true);
+  });
+});
+
+describe('reducers/<%=REDUCER_PATH%>/selectors', () => {
+  describe('<%=SELECTOR_NAME%>', () => {
+    const mockState = {
+    <%_ let spaces = ''; _%>
+    <%_ STATE_PARTS.forEach(part => {_%>
+      <%=spaces%><%=part%>: {
+      <%_ spaces+= '  '; _%>
+    <%_ }); _%>
+      <%=spaces%>value: 'test',
+    <%_ STATE_PARTS.forEach(part => {_%>
+      <%_ spaces = spaces.slice(0, -2); _%>
+      <%=spaces%>},
+    <%_ }); _%>
+    };
+    const result = selectors.<%=SELECTOR_NAME%>(mockState);
+    expect(result).toHaveProperty('value', 'test'));
+  });
+});
