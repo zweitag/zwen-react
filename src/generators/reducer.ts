@@ -1,8 +1,11 @@
 import * as Generator from 'yeoman-generator'
+import { GeneratorOptions } from '../types';
 
 class ReducerGenerator extends Generator {
-  constructor(args: any, options: any) {
-    super(args, options)
+  options!: GeneratorOptions;
+
+  constructor(args: any, options : GeneratorOptions) {
+    super(args, options);
   }
 
   writing() {

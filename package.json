@@ -8,28 +8,23 @@
   },
   "bugs": "https://github.com/https://github.com/zweitag/zwen-react/issues",
   "dependencies": {
-    "@oclif/command": "1",
-    "@oclif/config": "1",
-    "@oclif/plugin-help": "1",
-    "@types/yeoman-generator": "^2.0.3",
-    "yeoman-generator": "^2.0.5",
-    "yeoman-environment": "^2.0.6"
+    "@oclif/command": "^1",
+    "@oclif/config": "^1",
+    "@oclif/plugin-help": "^2",
+    "tslib": "^1",
+    "yeoman-environment": "^2.2.0",
+    "yeoman-generator": "^2.0.5"
   },
   "devDependencies": {
-    "@oclif/dev-cli": "1",
-    "@oclif/test": "1",
-    "@oclif/tslint": "1",
-    "@types/chai": "4",
-    "@types/mocha": "5",
-    "@types/node": "9",
-    "chai": "4",
-    "globby": "8",
-    "ts-node": "5",
-    "tslib": "1",
-    "tslint": "5",
-    "typescript": "2.8"
+    "@types/chai": "^4",
+    "@types/mocha": "^5",
+    "@types/node": "^10",
+    "@types/yeoman-generator": "^2.0.3",
+    "ts-node": "^6",
+    "typescript": "^2.9"
   },
   "engines": {
+    "yarn": "Please use npm",
     "node": ">=8.0.0"
   },
   "files": [
@@ -50,7 +45,6 @@
   "license": "MIT",
   "main": "lib/index.js",
   "oclif": {
-    "commands": "./lib/commands",
     "bin": "zwen",
     "plugins": [
       "@oclif/plugin-help"
