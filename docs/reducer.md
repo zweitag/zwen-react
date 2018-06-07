@@ -1,9 +1,6 @@
 # Reducer ([Redux Docs](https://redux.js.org/basics/reducers))
 
-We try to keep the state for a single reducer as small as possible. So in
-the best case we store primitive values (strings, numbers,
-booleans) or arrays. If we need to store objects, we try to keep them as
-flat as possible.
+We try to keep the state for a single reducer as small as possible. So in the best case we store primitive values (strings, numbers, booleans) or arrays. If we need to store objects, we try to keep them as flat as possible.
 
 ```
 // => reducers/myFeature/myReducer.js

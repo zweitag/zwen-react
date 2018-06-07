@@ -1,13 +1,13 @@
 # Selector [Redux Docs](https://redux.js.org/introduction/learning-resources#selectors)
 
-We always use selectors to access the state. That way we can refactor the
-reducer structure without having to change every single component. Selectors
-are written inside the respective [reducer](reducer.md) file.
+We always use selectors to access the state. That way we can refactor the reducer structure without having to change every single component.
+
+Every [reducer](reducer.md) file contains a simple selector for accessing the respective state.
 
 ```
 // => reducers/myFeature/myReducer.js
 
-export const getStateProp = (state) => state.pathToReducer.reducerName;
+export const getStateProp = state => state.pathToReducer.reducerName;
 ```
 
 Similar to reducers, selectors get exported on each folder level
@@ -26,10 +26,10 @@ and all folders from the *index.js* at top level:
 export * from './myFeature';
 ```
 
-When using multiple selectors it might be a good idea to combine them by using
-`createSelector` ([reselect Docs](https://github.com/reduxjs/reselect#createselectorinputselectors--inputselectors-resultfunc)):
+Sometimes you want to combine information from different areas of the state to keep the logic out of the component. A good way of doing this is by using `createSelector` ([reselect Docs](https://github.com/reduxjs/reselect#createselectorinputselectors--inputselectors-resultfunc)):
 
 ```
+// => selectors/ui.js
 import { createSelector } from 'reselect';
 
 export const getPostAuthor = createSelector(
@@ -42,3 +42,4 @@ export const getPostAuthor = createSelector(
   })
 );
 ```
+Since these types of selectors can't be matched with a single reducer, they should go in their own folder and file.
