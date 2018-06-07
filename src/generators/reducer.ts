@@ -11,7 +11,7 @@ class ReducerGenerator extends Generator {
   }
 
   writing() {
-    const pathPrefix = 'reducer';
+    const pathPrefix = 'reducers';
     const { path, fileName } = this.options;
     const filePath = path.split('/');
     filePath.push(fileName);
