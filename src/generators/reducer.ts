@@ -14,7 +14,7 @@ class ReducerGenerator extends Generator {
 
   writing() {
     const pathPrefix = 'reducers';
-    const { path, fileName } = this.options;
+    const { path, fileName, srcDir = 'src' } = this.options;
     const filePath = path.split('/').filter(p => p !== '');
     filePath.push(fileName);
 
@@ -27,7 +27,7 @@ class ReducerGenerator extends Generator {
 
     this.fs.copyTpl(
       this.templatePath(`${pathPrefix}/file.ejs`),
-      this.destinationPath(`src/${pathPrefix}/${filePath.join('/')}.js`),
+      this.destinationPath(`${srcDir}/${pathPrefix}/${filePath.join('/')}.js`),
       {
         STATE_PATH: filePath.join('.'),
         SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
@@ -36,7 +36,7 @@ class ReducerGenerator extends Generator {
 
     this.fs.copyTpl(
       this.templatePath(`${pathPrefix}/test.ejs`),
-      this.destinationPath(`src/${pathPrefix}/${filePath.join('/')}.test.js`),
+      this.destinationPath(`${srcDir}/${pathPrefix}/${filePath.join('/')}.test.js`),
       {
         REDUCER_NAME: fileName,
         REDUCER_PATH: filePath.join('/'),
@@ -46,7 +46,7 @@ class ReducerGenerator extends Generator {
       }
     );
 
-    let currentPath = `src/${pathPrefix}/`;
+    let currentPath = `${srcDir}/${pathPrefix}/`;
     let topLevel = true;
 
     filePath.forEach((subPath : string) => {

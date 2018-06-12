@@ -23,6 +23,16 @@ or
 yarn global add zwen-react
 ```
 
+## Configuration
+You can create a `.zwen` file in your project directory. Currently you only have a single option there.
+
+```
+// => .zwen
+{
+  "srcDir": "frontend/src" // default: "src"
+}
+```
+
 ## Usage
 ### Reducers
 ```

@@ -1,3 +1,4 @@
+import * as fs from 'fs-extra'
 import { Command } from '@oclif/command';
 import * as path from 'path';
 import { GeneratorOptions } from './types';
@@ -13,11 +14,19 @@ class Zwen extends Command {
   ];
 
   async run() {
+    let userConfig = {};
+
+    try {
+      userConfig = await fs.readJSON(path.join(process.cwd(), '.zwen'));
+    } catch (e) {}
+
     const { args } = this.parse(Zwen);
     const env = yeoman.createEnv();
     const generatorPathArr = ['.', 'generators'];
     const namespaceArr = ['zwen'];
-    const options = <GeneratorOptions> {};
+    const options = <GeneratorOptions> {
+      ...userConfig,
+    };
 
     generatorPathArr.push(args.scaffoldType);
     namespaceArr.push(args.scaffoldType);
