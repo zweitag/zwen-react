@@ -8,15 +8,21 @@ import * as t from './templates/reducers/templateStrings';
 class ReducerGenerator extends Generator {
   options!: GeneratorOptions;
 
-  constructor(args: any, options : GeneratorOptions) {
+  constructor(args: Array<string>, options : GeneratorOptions) {
     super(args, options);
   }
 
   writing() {
     const pathPrefix = 'reducers';
     const { path, fileName } = this.options;
-    const filePath = path.split('/');
+    const filePath = path.split('/').filter(p => p !== '');
     filePath.push(fileName);
+
+    if (filePath.length < 2) {
+      this.log('We do not support top-level reducers. Please specify at least one sub folder!');
+      return;
+    }
+
     const selectorNameArr = ['get', ...filePath];
 
     this.fs.copyTpl(
@@ -43,17 +49,25 @@ class ReducerGenerator extends Generator {
     let currentPath = `src/${pathPrefix}/`;
     let topLevel = true;
 
-    filePath.forEach(subPath => {
+    filePath.forEach((subPath : string) => {
       if (!this.fs.exists(`${currentPath}index.js`)) {
-        const templateName = topLevel ? 'top.ejs' : 'index.ejs';
+        const templates = topLevel
+          ? [
+            { in: 'top.ejs', out: 'index.js' },
+            { in: 'selectors.ejs', out: 'selectors.js' },
+          ] : [
+            { in: 'index.ejs', out: 'index.js' }
+          ];
 
-        this.fs.copyTpl(
-          this.templatePath(`${pathPrefix}/${templateName}`),
-          this.destinationPath(`${currentPath}index.js`),
-          {
-            REDUCER_NAME: subPath,
-          }
-        );
+        templates.forEach((template : { in: string, out: string }) => {
+          this.fs.copyTpl(
+            this.templatePath(`${pathPrefix}/${template.in}`),
+            this.destinationPath(`${currentPath}${template.out}`),
+            {
+              REDUCER_NAME: subPath,
+            }
+          );
+        });
 
       } else {
         const file = this.fs.read(`${currentPath}index.js`);
@@ -61,7 +75,17 @@ class ReducerGenerator extends Generator {
 
         if (topLevel) {
           if (!fileArr.includes(t.topLevelExport(subPath))) {
-            pushSort(fileArr, t.topLevelExport(subPath));
+            pushSort(fileArr, t.topLevelExport(subPath), '\n');
+          }
+
+          // selector top level file
+          const selectorFile = this.fs.read(`${currentPath}selectors.js`);
+          const selectorArr = selectorFile.split('\n').filter(line => line !== '');
+
+          if (!selectorArr.includes(t.exportAll(subPath))) {
+            pushSort(selectorArr, t.exportAll(subPath), '\n');
+
+            this.fs.write(`${currentPath}selectors.js`, selectorArr.join('\n'));
           }
 
         } else {
@@ -90,6 +114,7 @@ class ReducerGenerator extends Generator {
         }
         this.fs.write(`${currentPath}index.js`, fileArr.join('\n'));
       }
+
       topLevel = false;
       currentPath += `${subPath}/`;
     });
