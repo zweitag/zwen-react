@@ -2,6 +2,8 @@ import * as Generator from 'yeoman-generator'
 const camelCase = require('camelcase');
 
 import { GeneratorOptions } from '../types';
+import { pushSort } from '../utils';
+import * as t from './templates/reducers/templateStrings';
 
 class ReducerGenerator extends Generator {
   options!: GeneratorOptions;
@@ -39,57 +41,58 @@ class ReducerGenerator extends Generator {
     );
 
     let currentPath = `src/${pathPrefix}/`;
+    let topLevel = true;
+
     filePath.forEach(subPath => {
       if (!this.fs.exists(`${currentPath}index.js`)) {
+        const templateName = topLevel ? 'top.ejs' : 'index.ejs';
+
         this.fs.copyTpl(
-          this.templatePath(`${pathPrefix}/index.ejs`),
+          this.templatePath(`${pathPrefix}/${templateName}`),
           this.destinationPath(`${currentPath}index.js`),
           {
             REDUCER_NAME: subPath,
           }
         );
+
       } else {
         const file = this.fs.read(`${currentPath}index.js`);
         const fileArr = file.split('\n').filter(line => line !== '');
 
-        if (!fileArr.includes(`import ${subPath} from './${subPath}';`)) {
-          // imports
-          const importStart = fileArr.findIndex(line => /^import (?!{)/.test(line));
-          const importEnd = fileArr.findIndex(line => /^export/.test(line));
-          const importArray = fileArr.slice(importStart, importEnd);
+        if (topLevel) {
+          if (!fileArr.includes(t.topLevelExport(subPath))) {
+            pushSort(fileArr, t.topLevelExport(subPath));
+          }
 
-          importArray.push(`import ${subPath} from './${subPath}';`);
-          importArray.sort();
-          fileArr.splice(importStart, importArray.length - 1, '', ...importArray, '');
+        } else {
+          if (!fileArr.includes(t.defaultImport(subPath))) {
+            // imports
+            const { importStart, importEnd } = t.getImportMarkers(fileArr);
+            const importArray = fileArr.slice(importStart, importEnd);
 
-          // combines
-          const combineStart = fileArr.findIndex(line => /^export default combineReducers/.test(line));
-          const combineEnd = fileArr.findIndex(line => /^}\);$/.test(line));
-          const combineArray = fileArr.slice(combineStart + 1, combineEnd);
+            pushSort(importArray, t.defaultImport(subPath));
+            fileArr.splice(importStart, importArray.length - 1, '', ...importArray, '');
 
-          combineArray.push(`  ${subPath},`);
-          combineArray.sort();
-          fileArr.splice(combineStart + 1, combineArray.length - 1, ...combineArray);
+            // combines
+            const { combineStart, combineEnd } = t.getCombineMarkers(fileArr);
+            const combineArray = fileArr.slice(combineStart, combineEnd);
 
-          // exports
-          const exportStart = fileArr.findIndex(line => /^export \* from/.test(line));
-          const exportEnd = fileArr.length;
-          const exportArray = fileArr.slice(exportStart, exportEnd);
+            pushSort(combineArray, t.exportCombine(subPath));
+            fileArr.splice(combineStart, combineArray.length - 1, ...combineArray);
 
-          exportArray.push(`export * from './${subPath}';`);
-          exportArray.sort();
-          fileArr.splice(exportStart, exportArray.length - 1, '', ...exportArray);
+            // exports
+            const { exportStart, exportEnd } = t.getExportMarkers(fileArr);
+            const exportArray = fileArr.slice(exportStart, exportEnd);
 
-          this.fs.write(`${currentPath}index.js`, fileArr.join('\n'));
+            pushSort(exportArray, t.exportAll(subPath));
+            fileArr.splice(exportStart, exportArray.length - 1, '', ...exportArray);
+          }
         }
+        this.fs.write(`${currentPath}index.js`, fileArr.join('\n'));
       }
+      topLevel = false;
       currentPath += `${subPath}/`;
     });
-  }
-
-  logging() {
-    this.log('Destination Root: ' + this.destinationRoot());
-    this.log('Template Root: ' + this.sourceRoot());
   }
 }
 

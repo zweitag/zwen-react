@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "noImplicitAny": false,
     "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
