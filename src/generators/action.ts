@@ -2,7 +2,12 @@ import * as Generator from 'yeoman-generator'
 import * as ejs from 'ejs';
 
 import { Zwenerator, GeneratorOptions } from '../types';
-import { addAlphabetically, addAlphabeticallyAsArray, pushSort } from '../utils';
+import {
+  addAlphabetically,
+  addAlphabeticallyAsArray,
+  pushSort,
+  splitAt,
+} from '../utils';
 import * as t from './templates/templateStrings';
 
 const PATH_PREFIX = 'actions';
@@ -50,9 +55,9 @@ class ActionGenerator extends Generator implements Zwenerator {
     });
   }
 
-  createActionFiles() {
+  createActionFile() {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
-    const defaultLine = `import * as t from '@/actions/types';\n\n`;
+    const defaultLine = `${t.importAllTypes()}\n\n`;
     const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: defaultLine });
     const creatorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.ejs`));
 
@@ -78,6 +83,28 @@ class ActionGenerator extends Generator implements Zwenerator {
     }
 
     this.fs.write(`${destPath}/creators.js`, updatedFile + '\n');
+  }
+
+  createActionTest() {
+    const destPath = `${this.topLevelPath}/${this.options.path}`;
+    const testFile = this.fs.read(`${destPath}/creators.test.js`, { defaults: '' });
+    const firstTestIndex = testFile.indexOf(`\n  describe(`)
+    let extractedTests = splitAt(testFile, firstTestIndex);
+    const endIndex = extractedTests.lastIndexOf(`});`);
+    extractedTests = splitAt(extractedTests, endIndex);
+
+    const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
+
+    const newTest = ejs.render(
+      testTemplate,
+      {
+        ACTION_NAME: this.options.fileName,
+        ACTION_TYPE: 't.' + (this.withActionType ? this.options.fileName.toUpperCase() : 'ACTION_TYPE'),
+      }
+    ).trim();
+
+    console.log(extractedTests + '\n' + newTest);
+
   }
 
   createTypeFiles() {

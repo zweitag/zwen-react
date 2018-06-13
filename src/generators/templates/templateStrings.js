@@ -9,6 +9,9 @@ module.exports = {
   exportAll(path) {
     return `export * from './${path}';`;
   },
+  describeTestSuite(path) {
+    return `describe('${path}', () => {`;
+  },
 
   // reducers
   exportCombine(path) {
@@ -16,6 +19,9 @@ module.exports = {
   },
 
   // action types
+  importAllTypes() {
+    return `import * as t from '@/actions/types';`
+  },
   exportType(name, path) {
     return `export const ${name} = '${path}/${name}';`
   }
