@@ -33,16 +33,17 @@ class ActionGenerator extends Generator implements Zwenerator {
   updateExports() {
     let currentPath = `${this.topLevelPath}/`;
 
-    this.filePath.forEach((subPath : string) => {
+    this.filePath.forEach((subPath : string, index : number) => {
+      const lastLevel = index === this.filePath.length - 1;
       const creatorsFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
-      const newExport = subPath === this.options.fileName ? 'creators' : subPath;
-      const updatedCreatorsFile = addAlphabetically(creatorsFile, t.exportAll(`${newExport}`));
-      this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile);
+      const newExport = lastLevel ? 'creators' : subPath;
+      const updatedCreatorsFile = addAlphabetically(creatorsFile, t.exportAll(`${newExport}`)).trim();
+      this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile + '\n');
 
-      if (this.withActionType && subPath !== this.options.fileName) {
+      if (this.withActionType && !lastLevel) {
         const typesFile = this.fs.read(`${currentPath}/types.js`, { defaults: '' });
-        const updatedTypesFile = addAlphabetically(typesFile, t.exportAll(`${subPath}/types`));
-        this.fs.write(`${currentPath}/types.js`, updatedTypesFile);
+        const updatedTypesFile = addAlphabetically(typesFile, t.exportAll(`${subPath}/types`)).trim();
+        this.fs.write(`${currentPath}/types.js`, updatedTypesFile + '\n');
       }
 
       currentPath += `${subPath}/`;
@@ -77,6 +78,17 @@ class ActionGenerator extends Generator implements Zwenerator {
     }
 
     this.fs.write(`${destPath}/creators.js`, updatedFile + '\n');
+  }
+
+  createTypeFiles() {
+    if (this.withActionType) {
+      const destPath = `${this.topLevelPath}/${this.options.path}`;
+      const typesFile = this.fs.read(`${destPath}/types.js`, { defaults: '' });
+      const newType = t.exportType(this.options.fileName.toUpperCase(), this.options.path);
+      const updatedTypesFile = addAlphabetically(typesFile, newType);
+
+      this.fs.write(`${destPath}/types.js`, updatedTypesFile);
+    }
   }
 }
 

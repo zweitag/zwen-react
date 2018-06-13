@@ -14,4 +14,9 @@ module.exports = {
   exportCombine(path) {
     return `  ${path},`;
   },
+
+  // action types
+  exportType(name, path) {
+    return `export const ${name} = '${path}/${name}';`
+  }
 };
