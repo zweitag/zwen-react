@@ -1,17 +1,4 @@
 module.exports = {
-  topLevelExport(path) {
-    return `export { default as ${path} } from './${path}';`;
-  },
-  defaultImport(path) {
-    return `import ${path} from './${path}';`;
-  },
-  exportAll(path) {
-    return `export * from './${path}';`;
-  },
-  exportCombine(path) {
-    return `  ${path},`;
-  },
-
   getImportMarkers(fileArr) {
     return {
       importStart: fileArr.findIndex(line => /^import (?!{)/.test(line)),

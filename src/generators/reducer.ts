@@ -1,123 +1,127 @@
 import * as Generator from 'yeoman-generator'
 const camelCase = require('camelcase');
 
-import { GeneratorOptions } from '../types';
+import { Zwenerator, GeneratorOptions } from '../types';
 import { pushSort } from '../utils';
-import * as t from './templates/reducers/templateStrings';
+import * as t from './templates/templateStrings';
+import * as m from './templates/reducers/getMarkers';
 
-class ReducerGenerator extends Generator {
+const PATH_PREFIX = 'reducers';
+
+class ReducerGenerator extends Generator implements Zwenerator {
   options!: GeneratorOptions;
+  topLevelPath!: string;
+  filePath!: Array<string>;
 
   constructor(args: Array<string>, options : GeneratorOptions) {
     super(args, options);
+    this.topLevelPath = `${this.options.srcDir}/${PATH_PREFIX}`;
+    this.filePath = this.options.path.split('/').filter(p => p !== '');
+    this.filePath.push(this.options.fileName);
   }
 
-  writing() {
-    const pathPrefix = 'reducers';
-    const { path, fileName, srcDir = 'src' } = this.options;
-    const filePath = path.split('/').filter(p => p !== '');
-    filePath.push(fileName);
-
-    if (filePath.length < 2) {
+  checkFilePath() {
+    if (this.filePath.length < 2) {
       this.log('We do not support top-level reducers. Please specify at least one sub folder!');
-      return;
+      process.exit(0);
+    }
+  }
+
+  createTopLevel() {
+    if (!this.fs.exists(`${this.topLevelPath}/index.js`)) {
+      this.fs.write(`${this.topLevelPath}/index.js`, '');
     }
 
-    const selectorNameArr = ['get', ...filePath];
+    if (!this.fs.exists(`${this.topLevelPath}/selectors.js`)) {
+      this.fs.write(`${this.topLevelPath}/selectors.js`, '');
+    }
+  }
 
-    this.fs.copyTpl(
-      this.templatePath(`${pathPrefix}/file.ejs`),
-      this.destinationPath(`${srcDir}/${pathPrefix}/${filePath.join('/')}.js`),
-      {
-        STATE_PATH: filePath.join('.'),
-        SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
-      }
-    );
+  updateTopLevel() {
+    const indexFile = this.fs.read(`${this.topLevelPath}/index.js`);
+    const indexArr = indexFile.split('\n').filter(line => line !== '');
+    if (!indexArr.includes(t.topLevelExport(this.filePath[0]))) {
+      pushSort(indexArr, t.topLevelExport(this.filePath[0]), '');
+      this.fs.write(`${this.topLevelPath}/index.js`, indexArr.join('\n'));
+    }
 
-    this.fs.copyTpl(
-      this.templatePath(`${pathPrefix}/test.ejs`),
-      this.destinationPath(`${srcDir}/${pathPrefix}/${filePath.join('/')}.test.js`),
-      {
-        REDUCER_NAME: fileName,
-        REDUCER_PATH: filePath.join('/'),
-        STATE_PARTS: filePath,
-        STATE_PATH: filePath.join('.'),
-        SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
-      }
-    );
+    const selectorFile = this.fs.read(`${this.topLevelPath}/selectors.js`);
+    const selectorArr = selectorFile.split('\n').filter(line => line !== '');
+    if (!selectorArr.includes(t.exportAll(this.filePath[0]))) {
+      pushSort(selectorArr, t.exportAll(this.filePath[0]), '');
+      this.fs.write(`${this.topLevelPath}/selectors.js`, selectorArr.join('\n'));
+    }
+  }
 
-    let currentPath = `${srcDir}/${pathPrefix}/`;
-    let topLevel = true;
+  updateExports() {
+    let currentPath = `${this.topLevelPath}/${this.filePath[0]}/`;
+    const exportPaths = this.filePath.slice(1);
 
-    filePath.forEach((subPath : string) => {
-      if (!this.fs.exists(`${currentPath}index.js`)) {
-        const templates = topLevel
-          ? [
-            { in: 'top.ejs', out: 'index.js' },
-            { in: 'selectors.ejs', out: 'selectors.js' },
-          ] : [
-            { in: 'index.ejs', out: 'index.js' }
-          ];
-
-        templates.forEach((template : { in: string, out: string }) => {
-          this.fs.copyTpl(
-            this.templatePath(`${pathPrefix}/${template.in}`),
-            this.destinationPath(`${currentPath}${template.out}`),
-            {
-              REDUCER_NAME: subPath,
-            }
-          );
-        });
+    exportPaths.forEach((subPath : string) => {
+      if (!this.fs.exists(`${currentPath}/index.js`)) {
+        this.fs.copyTpl(
+          this.templatePath(`${PATH_PREFIX}/index.ejs`),
+          this.destinationPath(`${currentPath}/index.js`),
+          {
+            REDUCER_NAME: subPath,
+          }
+        );
 
       } else {
-        const file = this.fs.read(`${currentPath}index.js`);
+        const file = this.fs.read(`${currentPath}/index.js`);
         const fileArr = file.split('\n').filter(line => line !== '');
 
-        if (topLevel) {
-          if (!fileArr.includes(t.topLevelExport(subPath))) {
-            pushSort(fileArr, t.topLevelExport(subPath), '\n');
-          }
+        if (!fileArr.includes(t.defaultImport(subPath))) {
+          // imports
+          const { importStart, importEnd } = m.getImportMarkers(fileArr);
+          const importArray = fileArr.slice(importStart, importEnd);
 
-          // selector top level file
-          const selectorFile = this.fs.read(`${currentPath}selectors.js`);
-          const selectorArr = selectorFile.split('\n').filter(line => line !== '');
+          pushSort(importArray, t.defaultImport(subPath));
+          fileArr.splice(importStart, importArray.length - 1, '', ...importArray, '');
 
-          if (!selectorArr.includes(t.exportAll(subPath))) {
-            pushSort(selectorArr, t.exportAll(subPath), '\n');
+          // combines
+          const { combineStart, combineEnd } = m.getCombineMarkers(fileArr);
+          const combineArray = fileArr.slice(combineStart, combineEnd);
 
-            this.fs.write(`${currentPath}selectors.js`, selectorArr.join('\n'));
-          }
+          pushSort(combineArray, t.exportCombine(subPath));
+          fileArr.splice(combineStart, combineArray.length - 1, ...combineArray);
 
-        } else {
-          if (!fileArr.includes(t.defaultImport(subPath))) {
-            // imports
-            const { importStart, importEnd } = t.getImportMarkers(fileArr);
-            const importArray = fileArr.slice(importStart, importEnd);
+          // exports
+          const { exportStart, exportEnd } = m.getExportMarkers(fileArr);
+          const exportArray = fileArr.slice(exportStart, exportEnd);
 
-            pushSort(importArray, t.defaultImport(subPath));
-            fileArr.splice(importStart, importArray.length - 1, '', ...importArray, '');
-
-            // combines
-            const { combineStart, combineEnd } = t.getCombineMarkers(fileArr);
-            const combineArray = fileArr.slice(combineStart, combineEnd);
-
-            pushSort(combineArray, t.exportCombine(subPath));
-            fileArr.splice(combineStart, combineArray.length - 1, ...combineArray);
-
-            // exports
-            const { exportStart, exportEnd } = t.getExportMarkers(fileArr);
-            const exportArray = fileArr.slice(exportStart, exportEnd);
-
-            pushSort(exportArray, t.exportAll(subPath));
-            fileArr.splice(exportStart, exportArray.length - 1, '', ...exportArray);
-          }
+          pushSort(exportArray, t.exportAll(subPath));
+          fileArr.splice(exportStart, exportArray.length - 1, '', ...exportArray);
         }
-        this.fs.write(`${currentPath}index.js`, fileArr.join('\n'));
+        this.fs.write(`${currentPath}/index.js`, fileArr.join('\n'));
       }
-
-      topLevel = false;
       currentPath += `${subPath}/`;
     });
+  }
+
+  copyFileTemplates() {
+    const selectorNameArr = ['get', ...this.filePath];
+
+    this.fs.copyTpl(
+      this.templatePath(`${PATH_PREFIX}/file.ejs`),
+      this.destinationPath(`${this.topLevelPath}/${this.filePath.join('/')}.js`),
+      {
+        STATE_PATH: this.filePath.join('.'),
+        SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
+      }
+    );
+
+    this.fs.copyTpl(
+      this.templatePath(`${PATH_PREFIX}/test.ejs`),
+      this.destinationPath(`${this.topLevelPath}/${this.filePath.join('/')}.test.js`),
+      {
+        REDUCER_NAME: this.options.fileName,
+        REDUCER_PATH: this.filePath.join('/'),
+        STATE_PARTS: this.filePath,
+        STATE_PATH: this.filePath.join('.'),
+        SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
+      }
+    );
   }
 }
 

@@ -14,7 +14,9 @@ class Zwen extends Command {
   ];
 
   async run() {
-    let userConfig = {};
+    let userConfig = {
+      srcDir: 'src',
+    };
 
     try {
       userConfig = await fs.readJSON(path.join(process.cwd(), '.zwen'));

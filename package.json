@@ -10,7 +10,6 @@
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
-    "@oclif/plugin-help": "^2",
     "@types/camelcase": "^4.1.0",
     "camelcase": "^5.0.0",
     "fs-extra": "^6.0.1",
@@ -31,13 +30,11 @@
     "node": ">=8.0.0"
   },
   "files": [
-    "/.oclif.manifest.json",
     "/bin",
     "/lib"
   ],
   "homepage": "https://github.com/https://github.com/zweitag/zwen-react",
   "keywords": [
-    "oclif",
     "zweitag",
     "react",
     "redux",
@@ -48,19 +45,11 @@
   "license": "MIT",
   "main": "lib/index.js",
   "oclif": {
-    "bin": "zwen",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
+    "bin": "zwen"
   },
   "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
-    "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
-    "postpack": "rm -f .oclif.manifest.json",
-    "posttest": "tsc -p test --noEmit && tslint -p test -t stylish",
-    "prepack": "rm -rf lib && tsc && oclif-dev manifest && oclif-dev readme",
-    "version": "oclif-dev readme && git add README.md",
-    "test": "echo NO TESTS"
+    "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/"
   },
   "types": "lib/index.d.ts"
 }
