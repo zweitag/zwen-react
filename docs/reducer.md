@@ -40,5 +40,5 @@ All reducer folders get accessed by the top level *index.js* file
 ```
 // => reducers/index.js
 
-export default as myFeature from './myFeature';
+export { default as myFeature } from './myFeature';
 ```

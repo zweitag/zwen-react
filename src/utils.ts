@@ -8,3 +8,12 @@ export const pushSort = (arr : Array<any>, value : any, appendix? : any) => {
   }
   return newArr;
 }
+
+export const addAlphabetically = (file : string, addition : string) => {
+  const fileArray = file.split('\n').filter(line => line !== '');
+
+  if (!fileArray.includes(addition)) {
+    pushSort(fileArray, addition, '');
+  }
+  return fileArray.join('\n');
+}

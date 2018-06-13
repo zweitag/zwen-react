@@ -7,7 +7,7 @@ Every [reducer](reducer.md) file contains a simple selector for accessing the re
 ```
 // => reducers/myFeature/myReducer.js
 
-export const getStateProp = state => state.pathToReducer.reducerName;
+export const getStateProp = state => state.myFeature.myReducer;
 ```
 
 Similar to reducers, selectors get exported on each folder level

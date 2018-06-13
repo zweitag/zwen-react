@@ -1,6 +1,6 @@
 module.exports = {
   // global
-  topLevelExport(path) {
+  exportDefaultAs(path) {
     return `export { default as ${path} } from './${path}';`;
   },
   defaultImport(path) {

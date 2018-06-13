@@ -36,7 +36,7 @@ You can create a `.zwen` file in your project directory. Currently you only have
 ## Usage
 ### Reducers
 ```
-zwen reducer ui/modal
+zwen reducer path/to/reducer
 ```
 This will create a new reducer file `src/reducers/ui/modal.js` and a test file `src/reducers/ui/modal.test.js`. It will also wire up exports along the path or create new `index.js` files if they don't exist yet.
 

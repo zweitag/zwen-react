@@ -2,7 +2,7 @@ import * as Generator from 'yeoman-generator'
 const camelCase = require('camelcase');
 
 import { Zwenerator, GeneratorOptions } from '../types';
-import { pushSort } from '../utils';
+import { addAlphabetically, pushSort } from '../utils';
 import * as t from './templates/templateStrings';
 import * as m from './templates/reducers/getMarkers';
 
@@ -27,30 +27,14 @@ class ReducerGenerator extends Generator implements Zwenerator {
     }
   }
 
-  createTopLevel() {
-    if (!this.fs.exists(`${this.topLevelPath}/index.js`)) {
-      this.fs.write(`${this.topLevelPath}/index.js`, '');
-    }
-
-    if (!this.fs.exists(`${this.topLevelPath}/selectors.js`)) {
-      this.fs.write(`${this.topLevelPath}/selectors.js`, '');
-    }
-  }
-
   updateTopLevel() {
-    const indexFile = this.fs.read(`${this.topLevelPath}/index.js`);
-    const indexArr = indexFile.split('\n').filter(line => line !== '');
-    if (!indexArr.includes(t.topLevelExport(this.filePath[0]))) {
-      pushSort(indexArr, t.topLevelExport(this.filePath[0]), '');
-      this.fs.write(`${this.topLevelPath}/index.js`, indexArr.join('\n'));
-    }
+    const indexFile = this.fs.read(`${this.topLevelPath}/index.js`, { defaults: '' });
+    const updatedIndexFile = addAlphabetically(indexFile, t.exportDefaultAs(this.filePath[0]));
+    this.fs.write(`${this.topLevelPath}/index.js`, updatedIndexFile);
 
-    const selectorFile = this.fs.read(`${this.topLevelPath}/selectors.js`);
-    const selectorArr = selectorFile.split('\n').filter(line => line !== '');
-    if (!selectorArr.includes(t.exportAll(this.filePath[0]))) {
-      pushSort(selectorArr, t.exportAll(this.filePath[0]), '');
-      this.fs.write(`${this.topLevelPath}/selectors.js`, selectorArr.join('\n'));
-    }
+    const selectorFile = this.fs.read(`${this.topLevelPath}/selectors.js`, { defaults: '' });
+    const updatedSelectorFile = addAlphabetically(selectorFile, t.exportAll(this.filePath[0]));
+    this.fs.write(`${this.topLevelPath}/selectors.js`, updatedSelectorFile);
   }
 
   updateExports() {
