@@ -1,4 +1,5 @@
 import * as Generator from 'yeoman-generator'
+import * as ejs from 'ejs';
 
 import { Zwenerator, GeneratorOptions } from '../types';
 import { addAlphabetically, pushSort } from '../utils';
@@ -52,8 +53,15 @@ class ActionGenerator extends Generator implements Zwenerator {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
     const defaultLine = `import * as t from '@/actions/types';\n`;
     const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: defaultLine });
+    const creatorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.ejs`));
 
-    this.fs.write(`${destPath}/creators.js`, creatorsFile);
+    const creatorContent = ejs.render(
+      creatorTemplate,
+      {
+        ACTION_NAME: this.options.fileName,
+      }
+    );
+    this.fs.write(`${destPath}/creators.js`, creatorsFile + '\n' + creatorContent);
   }
 }
 
