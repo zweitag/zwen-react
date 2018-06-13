@@ -96,8 +96,3 @@ This will create a new reducer file `src/reducers/ui/modal.js` and a test file `
 |--index.js
 |--store.js
 ```
-
-## Usage
-### reducers {@link module:reducer|Docs}
-
-`zwen reducer filter/date`

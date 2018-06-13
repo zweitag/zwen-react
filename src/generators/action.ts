@@ -47,6 +47,14 @@ class ActionGenerator extends Generator implements Zwenerator {
       currentPath += `${subPath}/`;
     });
   }
+
+  createActionFiles() {
+    const destPath = `${this.topLevelPath}/${this.options.path}`;
+    const defaultLine = `import * as t from '@/actions/types';\n`;
+    const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: defaultLine });
+
+    this.fs.write(`${destPath}/creators.js`, creatorsFile);
+  }
 }
 
 export = ActionGenerator;
