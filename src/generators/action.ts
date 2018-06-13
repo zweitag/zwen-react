@@ -2,7 +2,7 @@ import * as Generator from 'yeoman-generator'
 import * as ejs from 'ejs';
 
 import { Zwenerator, GeneratorOptions } from '../types';
-import { addAlphabetically, pushSort } from '../utils';
+import { addAlphabetically, addAlphabeticallyAsArray, pushSort } from '../utils';
 import * as t from './templates/templateStrings';
 
 const PATH_PREFIX = 'actions';
@@ -51,17 +51,32 @@ class ActionGenerator extends Generator implements Zwenerator {
 
   createActionFiles() {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
-    const defaultLine = `import * as t from '@/actions/types';\n`;
+    const defaultLine = `import * as t from '@/actions/types';\n\n`;
     const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: defaultLine });
     const creatorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.ejs`));
 
-    const creatorContent = ejs.render(
+    const newCreator = ejs.render(
       creatorTemplate,
       {
         ACTION_NAME: this.options.fileName,
+        ACTION_TYPE: 't.' + (this.withActionType ? this.options.fileName.toUpperCase() : 'ACTION_TYPE'),
       }
-    );
-    this.fs.write(`${destPath}/creators.js`, creatorsFile + '\n' + creatorContent);
+    ).trim();
+
+    let updatedFile = '';
+    const fileArray = creatorsFile.split('\n\n');
+    const firstExportIndex = fileArray.findIndex((val : string) =>/export const/.test(val));
+
+    if (firstExportIndex === -1) {
+      updatedFile = creatorsFile + newCreator;
+
+    } else {
+      const creatorsArray = fileArray.splice(firstExportIndex).map(line => line.trim());
+      const updatedFileArray = fileArray.concat(addAlphabeticallyAsArray(creatorsArray, newCreator, false));
+      updatedFile = updatedFileArray.join('\n\n');
+    }
+
+    this.fs.write(`${destPath}/creators.js`, updatedFile + '\n');
   }
 }
 
