@@ -32,14 +32,14 @@ class ActionGenerator extends Generator implements Zwenerator {
 
   updateExports() {
     let currentPath = `${this.topLevelPath}/`;
-    const exportPaths = this.filePath.slice(0, -1);
 
-    exportPaths.forEach((subPath : string) => {
-      const creatorsFile = this.fs.read(`${currentPath}/creators.js`, { defaults: '' });
-      const updatedCreatorsFile = addAlphabetically(creatorsFile, t.exportAll(`${subPath}/creators`));
-      this.fs.write(`${currentPath}/creators.js`, updatedCreatorsFile);
+    this.filePath.forEach((subPath : string) => {
+      const creatorsFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
+      const newExport = subPath === this.options.fileName ? 'creators' : subPath;
+      const updatedCreatorsFile = addAlphabetically(creatorsFile, t.exportAll(`${newExport}`));
+      this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile);
 
-      if (this.withActionType) {
+      if (this.withActionType && subPath !== this.options.fileName) {
         const typesFile = this.fs.read(`${currentPath}/types.js`, { defaults: '' });
         const updatedTypesFile = addAlphabetically(typesFile, t.exportAll(`${subPath}/types`));
         this.fs.write(`${currentPath}/types.js`, updatedTypesFile);

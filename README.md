@@ -48,8 +48,9 @@ This will create a new reducer file `src/reducers/ui/modal.js` and a test file `
 |----[request]
 |------creators.js
 |------creators.test.js
+|------index.js
 |------types.js
-|----creators.js
+|----index.js
 |----types.js
 |
 |--components
