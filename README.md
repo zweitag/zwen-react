@@ -2,7 +2,7 @@
 
 *zwen-react* is a code generator CLI for projects using react and redux. We are currently working on a first version which will include generation of:
 
-* [actions](docs/action.md)
+* [actions](docs/action.md) :white_check_mark:
 * [components](docs/component.md)
 * constants
 * helpers
@@ -34,11 +34,25 @@ You can create a `.zwen` file in your project directory. Currently you only have
 ```
 
 ## Usage
+### Actions
+```
+zwen action path/to/actionName
+```
+This will create or update the action creators (`src/actions/path/to/creators.js`) and tests (`src/actions/path/to/creators.test.js`) with the `actionName`. If you choose to, it will also create or update `src/actions/path/to/types.js` with the type `ACTION_NAME`.
+
+It will also wire up exports along the path and create new `index.js` files if they don't exist.
+
+([More about actions](docs/action.md))
+
 ### Reducers
 ```
 zwen reducer path/to/reducer
 ```
-This will create a new reducer file `src/reducers/ui/modal.js` and a test file `src/reducers/ui/modal.test.js`. It will also wire up exports along the path or create new `index.js` files if they don't exist yet.
+This will create a new reducer file `src/reducers/path/to/reducer.js` and a test file `src/reducers/path/to/reducer.test.js`.
+
+It will also wire up exports along the path and create new `index.js` files if they don't exist.
+
+([More about reducers](docs/reducer.md))
 
 ## Architecture
 
