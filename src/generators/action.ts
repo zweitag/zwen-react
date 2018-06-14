@@ -87,11 +87,21 @@ class ActionGenerator extends Generator implements Zwenerator {
 
   createActionTest() {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
-
     const testFile = this.fs.read(`${destPath}/creators.test.js`, { defaults: '' });
+
     const firstTestIndex = testFile.indexOf(`\n  describe(`);
     const endIndex = testFile.lastIndexOf(`});`);
-    const [testHead, extractedTests, testFoot] = splitAt(testFile, firstTestIndex, endIndex);
+
+    let testHead, extractedTests, testFoot;
+    if (firstTestIndex === -1) {
+      const fileDefaults = t.creatorTestFile(this.options.path);
+      testHead = fileDefaults.head;
+      testFoot = fileDefaults.foot;
+      extractedTests = '';
+
+    } else {
+      [testHead, extractedTests, testFoot] = splitAt(testFile, firstTestIndex, endIndex);
+    }
 
     const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
     const newTest = ejs.render(

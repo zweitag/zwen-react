@@ -18,7 +18,15 @@ module.exports = {
     return `  ${path},`;
   },
 
-  // action types
+  // actions
+  creatorTestFile(path) {
+    return {
+      head: `import * as t from '@/actions/types';\n` +
+            `import * as actions from './creators';\n\n` +
+            `describe('${path}', () => {`,
+      foot: `});`,
+    };
+  },
   importAllTypes() {
     return `import * as t from '@/actions/types';`
   },
