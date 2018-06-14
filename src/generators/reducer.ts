@@ -1,8 +1,7 @@
 import * as Generator from 'yeoman-generator'
-const camelCase = require('camelcase');
 
 import { Zwenerator, GeneratorOptions } from '../types';
-import { addAlphabetically, pushSort } from '../utils';
+import { addAlphabetically } from '../utils';
 import * as t from './templates/templateStrings';
 import * as m from './templates/reducers/getMarkers';
 
@@ -60,21 +59,21 @@ class ReducerGenerator extends Generator implements Zwenerator {
           const { importStart, importEnd } = m.getImportMarkers(fileArr);
           const importArray = fileArr.slice(importStart, importEnd);
 
-          pushSort(importArray, t.defaultImport(subPath));
+          importArray.pushSort(t.defaultImport(subPath));
           fileArr.splice(importStart, importArray.length - 1, '', ...importArray, '');
 
           // combines
           const { combineStart, combineEnd } = m.getCombineMarkers(fileArr);
           const combineArray = fileArr.slice(combineStart, combineEnd);
 
-          pushSort(combineArray, t.exportCombine(subPath));
+          combineArray.pushSort(t.exportCombine(subPath));
           fileArr.splice(combineStart, combineArray.length - 1, ...combineArray);
 
           // exports
           const { exportStart, exportEnd } = m.getExportMarkers(fileArr);
           const exportArray = fileArr.slice(exportStart, exportEnd);
 
-          pushSort(exportArray, t.exportAll(subPath));
+          exportArray.pushSort(t.exportAll(subPath));
           fileArr.splice(exportStart, exportArray.length - 1, '', ...exportArray);
         }
         this.fs.write(`${currentPath}/index.js`, fileArr.join('\n'));
@@ -91,7 +90,7 @@ class ReducerGenerator extends Generator implements Zwenerator {
       this.destinationPath(`${this.topLevelPath}/${this.filePath.join('/')}.js`),
       {
         STATE_PATH: this.filePath.join('.'),
-        SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
+        SELECTOR_NAME: selectorNameArr.join('-').toCamelCase(),
       }
     );
 
@@ -103,7 +102,7 @@ class ReducerGenerator extends Generator implements Zwenerator {
         REDUCER_PATH: this.filePath.join('/'),
         STATE_PARTS: this.filePath,
         STATE_PATH: this.filePath.join('.'),
-        SELECTOR_NAME: camelCase(selectorNameArr.join('-')),
+        SELECTOR_NAME: selectorNameArr.join('-').toCamelCase(),
       }
     );
   }

@@ -4,11 +4,9 @@
 
 * [actions](docs/action.md) :white_check_mark:
 * [components](docs/component.md)
-* constants
 * helpers
 * middleware
 * [reducers](docs/reducer.md) :white_check_mark:
-* [selectors](docs/selector.md)
 
 Later versions will also include generation of barebones project architecture, webpack setup and addition of frequently used things like forms or loaders.
 
@@ -53,6 +51,7 @@ This will create a new reducer file `src/reducers/path/to/reducer.js` and a test
 It will also wire up exports along the path and create new `index.js` files if they don't exist.
 
 ([More about reducers](docs/reducer.md))
+([More about selectors](docs/selector.md))
 
 ## Architecture
 

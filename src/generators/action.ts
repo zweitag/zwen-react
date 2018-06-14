@@ -5,8 +5,6 @@ import { Zwenerator, GeneratorOptions } from '../types';
 import {
   addAlphabetically,
   addAlphabeticallyAsArray,
-  pushSort,
-  splitAt,
 } from '../utils';
 import * as t from './templates/templateStrings';
 
@@ -65,7 +63,7 @@ class ActionGenerator extends Generator implements Zwenerator {
       creatorTemplate,
       {
         ACTION_NAME: this.options.fileName,
-        ACTION_TYPE: 't.' + (this.withActionType ? this.options.fileName.toUpperCase() : 'ACTION_TYPE'),
+        ACTION_TYPE: 't.' + (this.withActionType ? this.options.fileName.toConstantCase() : 'ACTION_TYPE'),
       }
     ).trim();
 
@@ -100,7 +98,7 @@ class ActionGenerator extends Generator implements Zwenerator {
       extractedTests = '';
 
     } else {
-      [testHead, extractedTests, testFoot] = splitAt(testFile, firstTestIndex, endIndex);
+      [testHead, extractedTests, testFoot] = testFile.splitAt(firstTestIndex, endIndex);
     }
 
     const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
@@ -108,7 +106,7 @@ class ActionGenerator extends Generator implements Zwenerator {
       testTemplate,
       {
         ACTION_NAME: this.options.fileName,
-        ACTION_TYPE: this.withActionType ? this.options.fileName.toUpperCase() : 'ACTION_TYPE',
+        ACTION_TYPE: this.withActionType ? this.options.fileName.toConstantCase() : 'ACTION_TYPE',
       }
     );
 
@@ -125,7 +123,7 @@ class ActionGenerator extends Generator implements Zwenerator {
     if (this.withActionType) {
       const destPath = `${this.topLevelPath}/${this.options.path}`;
       const typesFile = this.fs.read(`${destPath}/types.js`, { defaults: '' });
-      const newType = t.exportType(this.options.fileName.toUpperCase(), this.options.path);
+      const newType = t.exportType(this.options.fileName.toConstantCase(), this.options.path);
       const updatedTypesFile = addAlphabetically(typesFile, newType);
 
       this.fs.write(`${destPath}/types.js`, updatedTypesFile);
