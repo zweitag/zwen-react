@@ -3,7 +3,7 @@
 *zwen-react* is a code generator CLI for projects using react and redux. We are currently working on a first version which will include generation of:
 
 * [actions](docs/action.md) :white_check_mark:
-* [components](docs/component.md)
+* [components](docs/component.md) :white_check_mark:
 * helpers
 * middleware
 * [reducers](docs/reducer.md) :white_check_mark:
@@ -41,6 +41,16 @@ This will create or update the action creators (`src/actions/path/to/creators.js
 It will also wire up exports along the path and create new `index.js` files if they don't exist.
 
 ([More about actions](docs/action.md))
+
+### Components
+```
+zwen component path/to/component
+```
+This will create a new component file (`src/components/path/to/Component.js`). You can choose if the component should be connected to the store, or – if not – should be set up with props.
+
+It will also wire up exports along the path and create new `index.js` files if they don't exist.
+
+([More about components](docs/component.md))
 
 ### Reducers
 ```

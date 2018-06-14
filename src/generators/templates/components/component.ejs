@@ -1,0 +1,38 @@
+import React from 'react';
+<%_ if (WITH_PROPS) {_%>
+import PropTypes from 'prop-types';
+<%_ } _%>
+<%_ if (CONNECTED) { _%>
+import { connect } from 'react-redux';
+
+import * as actions from '@/actions';
+import * as selectors from '@/selectors';
+
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch => ({
+
+});
+<%_ } _%>
+
+const <%=COMPONENT_NAME%> = (<%_ if (WITH_PROPS) { _%>{}<%_ } %>) => (
+
+);
+
+<%_ if (WITH_PROPS) { _%>
+<%=COMPONENT_NAME%>.propTypes = {
+
+};
+
+<%=COMPONENT_NAME%>.defaultProps = {
+
+};
+
+<%_ } _%>
+<%_ if (CONNECTED) { _%>
+export default connect(mapStateToProps, mapDispatchToProps)(<%=COMPONENT_NAME%>);
+<%_ } else { _%>
+export default <%=COMPONENT_NAME%>;
+<%_ } _%>

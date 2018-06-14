@@ -1,5 +1,6 @@
-const constantCase = require('constant-case');
 const camelCase = require('camel-case');
+const constantCase = require('constant-case');
+const pascalCase = require('pascal-case');
 
 interface Array<T> {
   filterEmptyStrings() : Array<T>
@@ -26,18 +27,16 @@ Array.prototype.pushSort =
   }
 
 interface String {
-  splitAt(startIndex : number, endIndex? : number) : Array<string>
-  toConstantCase() : string,
   toCamelCase() : string,
+  toConstantCase() : string,
+  toPascalCase() : string,
+  splitAt(startIndex : number, endIndex? : number) : Array<string>
 }
 
-String.prototype.splitAt =
-  String.prototype.splitAt ||
-  function splitAt(this : string, startIndex : number, endIndex : number = this.length) {
-    return [
-      this.slice(0, startIndex),
-      this.slice(startIndex, endIndex),
-      this.slice(endIndex)].filterEmptyStrings();
+String.prototype.toCamelCase =
+  String.prototype.toCamelCase ||
+  function toCamelCase(this : string) {
+    return camelCase(this);
   }
 
 String.prototype.toConstantCase =
@@ -46,8 +45,17 @@ String.prototype.toConstantCase =
     return constantCase(this);
   }
 
-String.prototype.toCamelCase =
-  String.prototype.toCamelCase ||
-  function toCamelCase(this : string) {
-    return camelCase(this);
+String.prototype.toPascalCase =
+  String.prototype.toPascalCase ||
+  function toPascalCase(this : string) {
+    return pascalCase(this);
+  }
+
+String.prototype.splitAt =
+  String.prototype.splitAt ||
+  function splitAt(this : string, startIndex : number, endIndex : number = this.length) {
+    return [
+      this.slice(0, startIndex),
+      this.slice(startIndex, endIndex),
+      this.slice(endIndex)].filterEmptyStrings();
   }
