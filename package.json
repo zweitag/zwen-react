@@ -11,8 +11,6 @@
     "@oclif/command": "^1",
     "@oclif/config": "^1",
     "@oclif/plugin-help": "^2.0.5",
-    "@types/camelcase": "^4.1.0",
-    "@types/fs-extra": "^5.0.3",
     "camel-case": "^3.0.0",
     "constant-case": "^2.0.0",
     "ejs": "^2.6.1",
@@ -23,8 +21,10 @@
     "yeoman-generator": "^2.0.5"
   },
   "devDependencies": {
+    "@types/camelcase": "^4.1.0",
     "@types/chai": "^4",
     "@types/ejs": "^2.6.0",
+    "@types/fs-extra": "^5.0.3",
     "@types/mocha": "^5",
     "@types/node": "^10",
     "@types/yeoman-generator": "^2.0.3",
@@ -58,7 +58,8 @@
   },
   "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
-    "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/"
+    "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
+    "prepublish": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/"
   },
   "types": "lib/index.d.ts"
 }
