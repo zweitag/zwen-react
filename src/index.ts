@@ -1,12 +1,15 @@
 import './prototypes';
 
-import * as fs from 'fs-extra'
 import { Command, flags } from '@oclif/command';
 import * as path from 'path';
 import { GeneratorOptions } from './types';
 import scaffoldTypes from './scaffoldTypes';
 
 const yeoman = require('yeoman-environment');
+const memFs = require('mem-fs');
+const memFsEditor = require('mem-fs-editor');
+
+const fs = memFsEditor.create(memFs.create());
 
 class Zwen extends Command {
   static usage = '[SCAFFOLD_TYPE] [PATH_WITH_NAME] [OPTIONS]';
@@ -36,13 +39,10 @@ class Zwen extends Command {
   };
 
   async run() {
-    let userConfig = {
+    const defaultConfig = {
       srcDir: 'src',
     };
-
-    try {
-      userConfig = await fs.readJSON(path.join(process.cwd(), '.zwen'));
-    } catch (e) {}
+    const userConfig = fs.readJSON(path.join(process.cwd(), '.zwen'), defaultConfig);
 
     const { args, flags } = this.parse(Zwen);
     const env = yeoman.createEnv();
