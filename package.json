@@ -1,5 +1,5 @@
 {
-  "name": "zwen",
+  "name": "zwen-react",
   "description": "Code generator CLI for projects using react and redux",
   "version": "0.5.0",
   "author": "Zweitag GmbH @zweitag",
