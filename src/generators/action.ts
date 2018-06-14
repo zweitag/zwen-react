@@ -21,7 +21,7 @@ class ActionGenerator extends Generator implements Zwenerator {
   constructor(args: Array<string>, options : GeneratorOptions) {
     super(args, options);
     this.topLevelPath = `${this.options.srcDir}/${PATH_PREFIX}`;
-    this.filePath = this.options.path.split('/').filter(p => p !== '');
+    this.filePath = this.options.path.split('/').filterEmptyStrings();
     this.filePath.push(this.options.fileName);
   }
 
@@ -87,24 +87,28 @@ class ActionGenerator extends Generator implements Zwenerator {
 
   createActionTest() {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
+
     const testFile = this.fs.read(`${destPath}/creators.test.js`, { defaults: '' });
-    const firstTestIndex = testFile.indexOf(`\n  describe(`)
-    let extractedTests = splitAt(testFile, firstTestIndex);
-    const endIndex = extractedTests.lastIndexOf(`});`);
-    extractedTests = splitAt(extractedTests, endIndex);
+    const firstTestIndex = testFile.indexOf(`\n  describe(`);
+    const endIndex = testFile.lastIndexOf(`});`);
+    const [testHead, extractedTests, testFoot] = splitAt(testFile, firstTestIndex, endIndex);
 
     const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
-
     const newTest = ejs.render(
       testTemplate,
       {
         ACTION_NAME: this.options.fileName,
-        ACTION_TYPE: 't.' + (this.withActionType ? this.options.fileName.toUpperCase() : 'ACTION_TYPE'),
+        ACTION_TYPE: this.withActionType ? this.options.fileName.toUpperCase() : 'ACTION_TYPE',
       }
-    ).trim();
+    );
 
-    console.log(extractedTests + '\n' + newTest);
+    const splitString = '\n  describe';
+    const updatedTests = (extractedTests + '\n' + newTest)
+      .split(splitString)
+      .sort()
+      .join(splitString);
 
+    this.fs.write(`${destPath}/creators.test.js`, testHead + updatedTests + testFoot);
   }
 
   createTypeFiles() {

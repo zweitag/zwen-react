@@ -1,3 +1,5 @@
+import './prototypes';
+
 import * as fs from 'fs-extra'
 import { Command } from '@oclif/command';
 import * as path from 'path';

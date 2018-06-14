@@ -16,7 +16,7 @@ class ReducerGenerator extends Generator implements Zwenerator {
   constructor(args: Array<string>, options : GeneratorOptions) {
     super(args, options);
     this.topLevelPath = `${this.options.srcDir}/${PATH_PREFIX}`;
-    this.filePath = this.options.path.split('/').filter(p => p !== '');
+    this.filePath = this.options.path.split('/').filterEmptyStrings();
     this.filePath.push(this.options.fileName);
   }
 
@@ -53,7 +53,7 @@ class ReducerGenerator extends Generator implements Zwenerator {
 
       } else {
         const file = this.fs.read(`${currentPath}/index.js`);
-        const fileArr = file.split('\n').filter(line => line !== '');
+        const fileArr = file.split('\n').filterEmptyStrings();
 
         if (!fileArr.includes(t.defaultImport(subPath))) {
           // imports

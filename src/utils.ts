@@ -25,4 +25,5 @@ export const pushSort = (arr : Array<any>, value : any, appendix? : any) => {
   return newArr;
 }
 
-export const splitAt = (x, index) => [x.slice(0, index), x.slice(index)]
+export const splitAt = (x, startIndex, endIndex = x.length) =>
+  [x.slice(0, startIndex), x.slice(startIndex, endIndex), x.slice(endIndex)].filter(s => s !== '');
