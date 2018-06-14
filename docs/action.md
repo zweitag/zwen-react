@@ -13,7 +13,7 @@ export const doSomething = () => ({
 To prevent spelling errors, _action types_ are stored in variables.
 ```
 // => actions/myFeature/types.js
-export conast DO_SOMETHING = 'myFeature/DO_SOMETHING';
+export const DO_SOMETHING = 'myFeature/DO_SOMETHING';
 ```
 Both _types_ and _creators_ are being exported like this:
 ```
