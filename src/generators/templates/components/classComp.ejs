@@ -1,0 +1,44 @@
+import React from 'react';
+import PropTypes from 'prop-types';
+<%_ if (CONNECTED) { _%>
+import { connect } from 'react-redux';
+
+import * as actions from '@/actions';
+import * as selectors from '@/selectors';
+
+const mapStateToProps = state => ({
+
+});
+
+const mapDispatchToProps = dispatch => ({
+
+});
+<%_ } _%>
+
+class <%=COMPONENT_NAME%> extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    const {} = this.props;
+
+    return (
+
+    )
+  }
+}
+
+<%=COMPONENT_NAME%>.propTypes = {
+
+};
+
+<%=COMPONENT_NAME%>.defaultProps = {
+
+};
+
+<%_ if (CONNECTED) { _%>
+export default connect(mapStateToProps, mapDispatchToProps)(<%=COMPONENT_NAME%>);
+<%_ } else { _%>
+export default <%=COMPONENT_NAME%>;
+<%_ } _%>

@@ -1,7 +1,7 @@
 {
   "name": "zwen",
-  "description": "zwen is a code generator CLI for projects using react and redux",
-  "version": "0.2.0",
+  "description": "Code generator CLI for projects using react and redux",
+  "version": "0.5.0",
   "author": "Zweitag GmbH @zweitag",
   "bin": {
     "zwen": "./bin/run"
@@ -10,6 +10,7 @@
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
+    "@oclif/plugin-help": "^2.0.5",
     "@types/camelcase": "^4.1.0",
     "@types/fs-extra": "^5.0.3",
     "camel-case": "^3.0.0",
@@ -37,6 +38,9 @@
   "files": [
     "/bin",
     "/lib"
+  ],
+  "plugins": [
+    "@oclif/plugin-help"
   ],
   "homepage": "https://github.com/https://github.com/zweitag/zwen-react",
   "keywords": [

@@ -13,6 +13,12 @@ class ComponentGenerator extends Generator implements Zwenerator {
 
   constructor(args: Array<string>, options : GeneratorOptions) {
     super(args, options);
+
+    this.option('classComp', {
+      description: 'Will create a class component where you can use React\'s lifecycle methods.',
+      alias: '-c',
+    });
+
     this.topLevelPath = `${this.options.srcDir}/${PATH_PREFIX}`;
     this.filePath = this.options.path.split('/').filterEmptyStrings();
     this.filePath.push(this.options.fileName);
@@ -41,8 +47,9 @@ class ComponentGenerator extends Generator implements Zwenerator {
   writing() {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
     const componentName = this.options.fileName.toPascalCase();
+    const templateName = this.options.classComp ? 'classComp' : 'component';
     this.fs.copyTpl(
-      this.templatePath(`${PATH_PREFIX}/component.ejs`),
+      this.templatePath(`${PATH_PREFIX}/${templateName}.ejs`),
       this.destinationPath(`${destPath}/${componentName}.js`),
       {
         COMPONENT_NAME: componentName,
