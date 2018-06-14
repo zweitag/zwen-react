@@ -56,7 +56,7 @@ class Zwen extends Command {
     generatorPathArr.push(args.scaffold_type);
     namespaceArr.push(args.scaffold_type);
     options.path = path.parse(args.path_with_name).dir;
-    options.fileName = path.parse(args.relativePath).name;
+    options.fileName = path.parse(args.path_with_name).name;
 
     const namespace = namespaceArr.join(':');
     const generatorPath =generatorPathArr.join('/');
