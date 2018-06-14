@@ -1,7 +1,7 @@
 {
   "name": "zwen-react",
   "description": "Code generator CLI for projects using react and redux",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "Zweitag GmbH @zweitag",
   "bin": {
     "zwen": "./bin/run"
@@ -24,7 +24,6 @@
     "@types/camelcase": "^4.1.0",
     "@types/chai": "^4",
     "@types/ejs": "^2.6.0",
-    "@types/fs-extra": "^5.0.3",
     "@types/mocha": "^5",
     "@types/node": "^10",
     "@types/yeoman-generator": "^2.0.3",
@@ -59,7 +58,7 @@
   "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
     "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
-    "prepublish": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/"
+    "prepare": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/"
   },
   "types": "lib/index.d.ts"
 }
