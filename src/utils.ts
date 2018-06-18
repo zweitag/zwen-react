@@ -22,18 +22,44 @@ interface fileParts {
 
 export function extractFileParts(file : string, extractTerm : RegExp, endTerm? : RegExp) {
   const parts : fileParts = {};
+  const extr = new RegExp(extractTerm.source, 'g');
 
-  const firstMatch = file.search(extractTerm);
+  const firstMatch = file.search(extr);
   if (firstMatch === -1) {
     return parts;
   }
 
   parts.before = file.substr(0, firstMatch);
+  parts.extracts = [];
 
-  if (endTerm) {
-    const endMatch = file.search(endTerm);
-    if (endMatch) {
-      parts.after = file.substr(endMatch);
+  const firstResult = extr.exec(file);
+
+  if (firstResult) {
+    let prevIndex = firstResult.index;
+    let hasResults = true;
+
+    while (hasResults) {
+      const result = extr.exec(file);
+
+      if (result) {
+        const nextIndex = result.index;
+        parts.extracts.push(file.substring(prevIndex, nextIndex));
+        prevIndex = nextIndex;
+
+      } else {
+        let lastPart = file.substr(prevIndex);
+        let after;
+
+        if (endTerm) {
+          const splitTerm = new RegExp(`(?=${endTerm.source})`);
+          [lastPart, after] = lastPart.split(splitTerm);
+        }
+
+        parts.extracts.push(lastPart);
+        parts.after = after;
+
+        hasResults = false;
+      }
     }
   }
 
