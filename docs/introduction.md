@@ -36,7 +36,7 @@ Of course the _type_ needs also to be defined, but this is pretty staightforward
 epxort const TOGGLE_MENU = 'ui/TOGGLE_MENU';
 ```
 
-Allright, so what happens until now is that the `dispatch` method in our `MenuButton` component sends out an action with a specific type. By definition this actions arrives at every single _reducer_ of the app. Each can decide, if this action concerns it and act accordingly. (Read more about reducers in the [reducers' docs](reducer.md)).
+Alright, so what happens until now is that the `dispatch` method in our `MenuButton` component sends out an action with a specific type. By definition this actions arrives at every single _reducer_ of the app. Each can decide, if this action concerns it and act accordingly. Keep in mind that it won't have access to the complete state but only to its own segment. (Read more about reducers in the [reducers' docs](reducer.md)).
 ```
 // => reducers/ui/menu.js
 export default (state = false, action) => {
@@ -47,7 +47,7 @@ export default (state = false, action) => {
 }
 ```
 
-The reducer realized that it needs to change its state, but how do we reflect this in our UI? Easy, add a selector that returns exactly what we need:
+The reducer realized that it needs to change its state, but how do we reflect this in our UI? Easy, add a selector that returns exactly what we need. Be carful to always pass in the complete state object. That way you only have make changes to the selector if you choose to refactor the state structure.
 ```
 // => reducers/ui/menu.js
 export const getIsMenuOpen = state => state.ui.menu;
