@@ -38,9 +38,9 @@ class ActionGenerator extends Generator implements Zwenerator {
 
     this.filePath.forEach((subPath : string, index : number) => {
       const lastLevel = index === this.filePath.length - 1;
-      const creatorsFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
+      const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
       const newExport = lastLevel ? 'creators' : subPath;
-      const updatedCreatorsFile = addAlphabetically(creatorsFile, t.exportAll(`${newExport}`)).trim();
+      const updatedCreatorsFile = addAlphabetically(indexFile, t.exportAll(`${newExport}`)).trim();
       this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile + '\n');
 
       if (this.withActionType && !lastLevel) {

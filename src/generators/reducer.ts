@@ -28,12 +28,12 @@ class ReducerGenerator extends Generator implements Zwenerator {
 
   updateTopLevel() {
     const indexFile = this.fs.read(`${this.topLevelPath}/index.js`, { defaults: '' });
-    const updatedIndexFile = addAlphabetically(indexFile, t.exportDefaultAs(this.filePath[0]));
-    this.fs.write(`${this.topLevelPath}/index.js`, updatedIndexFile);
+    const updatedIndexFile = addAlphabetically(indexFile, t.exportDefaultAs(this.filePath[0])).trim();
+    this.fs.write(`${this.topLevelPath}/index.js`, updatedIndexFile + '\n');
 
     const selectorFile = this.fs.read(`${this.topLevelPath}/selectors.js`, { defaults: '' });
-    const updatedSelectorFile = addAlphabetically(selectorFile, t.exportAll(this.filePath[0]));
-    this.fs.write(`${this.topLevelPath}/selectors.js`, updatedSelectorFile);
+    const updatedSelectorFile = addAlphabetically(selectorFile, t.exportAll(this.filePath[0])).trim();
+    this.fs.write(`${this.topLevelPath}/selectors.js`, updatedSelectorFile + '\n');
   }
 
   updateExports() {
@@ -76,7 +76,7 @@ class ReducerGenerator extends Generator implements Zwenerator {
           exportArray.pushSort(t.exportAll(subPath));
           fileArr.splice(exportStart, exportArray.length - 1, '', ...exportArray);
         }
-        this.fs.write(`${currentPath}/index.js`, fileArr.join('\n'));
+        this.fs.write(`${currentPath}/index.js`, fileArr.join('\n').trim() + '\n');
       }
       currentPath += `${subPath}/`;
     });
