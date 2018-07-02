@@ -1,8 +1,9 @@
 import * as Generator from 'yeoman-generator'
 
 import { Zwenerator, GeneratorOptions } from '../types';
-import { addAlphabetically } from '../utils';
+import { addAlphabeticallyAndCombine, extractFileParts } from '../utils';
 import * as t from './templates/templateStrings';
+import * as r from './templates/regex';
 import * as m from './templates/reducers/getMarkers';
 
 const PATH_PREFIX = 'reducers';
@@ -28,12 +29,14 @@ class ReducerGenerator extends Generator implements Zwenerator {
 
   updateTopLevel() {
     const indexFile = this.fs.read(`${this.topLevelPath}/index.js`, { defaults: '' });
-    const updatedIndexFile = addAlphabetically(indexFile, t.exportDefaultAs(this.filePath[0])).trim();
-    this.fs.write(`${this.topLevelPath}/index.js`, updatedIndexFile + '\n');
+    const indexFileParts = extractFileParts(indexFile, r.exportDefaultAs);
+    const updatedIndexFile = addAlphabeticallyAndCombine(indexFileParts, t.exportDefaultAs(this.filePath[0]));
+    this.fs.write(`${this.topLevelPath}/index.js`, updatedIndexFile);
 
     const selectorFile = this.fs.read(`${this.topLevelPath}/selectors.js`, { defaults: '' });
-    const updatedSelectorFile = addAlphabetically(selectorFile, t.exportAll(this.filePath[0])).trim();
-    this.fs.write(`${this.topLevelPath}/selectors.js`, updatedSelectorFile + '\n');
+    const selectorFileParts = extractFileParts(selectorFile, r.exportAll);
+    const updatedSelectorFile = addAlphabeticallyAndCombine(selectorFileParts, t.exportAll(this.filePath[0]));
+    this.fs.write(`${this.topLevelPath}/selectors.js`, updatedSelectorFile);
   }
 
   updateExports() {
@@ -52,31 +55,18 @@ class ReducerGenerator extends Generator implements Zwenerator {
 
       } else {
         const file = this.fs.read(`${currentPath}/index.js`);
-        const fileArr = file.split('\n').filterEmptyStrings();
+        if (!file.includes(t.defaultImport(subPath))) {
+          const importParts = extractFileParts(file, r.importDefault, r.exportDefaultCombine);
+          const fileWithImports = addAlphabeticallyAndCombine(importParts, t.defaultImport(subPath));
 
-        if (!fileArr.includes(t.defaultImport(subPath))) {
-          // imports
-          const { importStart, importEnd } = m.getImportMarkers(fileArr);
-          const importArray = fileArr.slice(importStart, importEnd);
+          const combinedParts = extractFileParts(fileWithImports, r.exportCombine, r.combineEnd)
+          const fileWithCombinedReducer = addAlphabeticallyAndCombine(combinedParts, t.exportCombine(subPath), false);
 
-          importArray.pushSort(t.defaultImport(subPath));
-          fileArr.splice(importStart, importArray.length - 1, '', ...importArray, '');
+          const exportParts = extractFileParts(fileWithCombinedReducer, r.exportAll);
+          const updatedFile = addAlphabeticallyAndCombine(exportParts, t.exportAll(subPath));
 
-          // combines
-          const { combineStart, combineEnd } = m.getCombineMarkers(fileArr);
-          const combineArray = fileArr.slice(combineStart, combineEnd);
-
-          combineArray.pushSort(t.exportCombine(subPath));
-          fileArr.splice(combineStart, combineArray.length - 1, ...combineArray);
-
-          // exports
-          const { exportStart, exportEnd } = m.getExportMarkers(fileArr);
-          const exportArray = fileArr.slice(exportStart, exportEnd);
-
-          exportArray.pushSort(t.exportAll(subPath));
-          fileArr.splice(exportStart, exportArray.length - 1, '', ...exportArray);
+          this.fs.write(`${currentPath}/index.js`, updatedFile);
         }
-        this.fs.write(`${currentPath}/index.js`, fileArr.join('\n').trim() + '\n');
       }
       currentPath += `${subPath}/`;
     });

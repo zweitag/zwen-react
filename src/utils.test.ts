@@ -1,8 +1,22 @@
 import * as expect from 'jest-matchers';
+import './prototypes';
 
 import * as utils from './utils';
 
 describe('utils', () => {
+  describe('addAlphabeticallyAndCombine', () => {
+    it('should add the addition to the file extracts', () => {
+      const testFileParts = {
+        before: 'testLine',
+        extracts: ['abc', 'def', 'qwe'],
+        after: 'lastLine',
+      };
+      const addition = 'asd';
+      const result = utils.addAlphabeticallyAndCombine(testFileParts, addition);
+      expect(result).toBe(`testLine\n\nabc\nasd\ndef\nqwe\n\nlastLine\n`);
+    });
+  });
+
   describe('extractFileParts', () => {
     it('should return the test file as "before" if the extraction term does not match', () => {
       const testFile = 'abc123';
@@ -10,9 +24,7 @@ describe('utils', () => {
 
       const parts = utils.extractFileParts(testFile, extractTerm);
 
-      expect(parts).toEqual({
-        before: 'abc123',
-      });
+      expect(parts).toHaveProperty('before', 'abc123');
     });
 
     it('should extract the text before the extraction term', () => {
