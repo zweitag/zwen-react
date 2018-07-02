@@ -4,8 +4,10 @@ import * as ejs from 'ejs';
 import { Zwenerator, GeneratorOptions } from '../types';
 import {
   addAlphabetically,
-  addAlphabeticallyAsArray,
+  addAlphabeticallyAndCombine,
+  extractFileParts,
 } from '../utils';
+import * as r from './templates/regex';
 import * as t from './templates/templateStrings';
 
 const PATH_PREFIX = 'actions';
@@ -39,14 +41,17 @@ class ActionGenerator extends Generator implements Zwenerator {
     this.filePath.forEach((subPath : string, index : number) => {
       const lastLevel = index === this.filePath.length - 1;
       const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
+      const fileParts = extractFileParts(indexFile, r.exportAll);
       const newExport = lastLevel ? 'creators' : subPath;
-      const updatedCreatorsFile = addAlphabetically(indexFile, t.exportAll(`${newExport}`)).trim();
-      this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile + '\n');
+      const updatedCreatorsFile = addAlphabeticallyAndCombine(fileParts, t.exportAll(newExport));
+
+      this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile);
 
       if (this.withActionType && !lastLevel) {
         const typesFile = this.fs.read(`${currentPath}/types.js`, { defaults: '' });
-        const updatedTypesFile = addAlphabetically(typesFile, t.exportAll(`${subPath}/types`)).trim();
-        this.fs.write(`${currentPath}/types.js`, updatedTypesFile + '\n');
+        const typeFileParts = extractFileParts(typesFile, r.exportAll);
+        const updatedTypesFile = addAlphabeticallyAndCombine(typeFileParts, t.exportAll(`${subPath}/types`));
+        this.fs.write(`${currentPath}/types.js`, updatedTypesFile);
       }
 
       currentPath += `${subPath}/`;
@@ -55,8 +60,7 @@ class ActionGenerator extends Generator implements Zwenerator {
 
   createActionFile() {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
-    const defaultLine = `${t.importAllTypes()}\n\n`;
-    const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: defaultLine });
+    const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: t.importAllTypes() });
     const creatorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.ejs`));
 
     const newCreator = ejs.render(
@@ -67,39 +71,19 @@ class ActionGenerator extends Generator implements Zwenerator {
       }
     ).trim();
 
-    let updatedFile = '';
-    const fileArray = creatorsFile.split('\n\n');
-    const firstExportIndex = fileArray.findIndex((val : string) =>/export const/.test(val));
+    const fileParts = extractFileParts(creatorsFile, r.exportAction);
+    const updatedFile = addAlphabeticallyAndCombine(fileParts, newCreator, true, '\n\n');
 
-    if (firstExportIndex === -1) {
-      updatedFile = creatorsFile + newCreator;
-
-    } else {
-      const creatorsArray = fileArray.splice(firstExportIndex).map(line => line.trim());
-      const updatedFileArray = fileArray.concat(addAlphabeticallyAsArray(creatorsArray, newCreator, false));
-      updatedFile = updatedFileArray.join('\n\n');
-    }
-
-    this.fs.write(`${destPath}/creators.js`, updatedFile + '\n');
+    this.fs.write(`${destPath}/creators.js`, updatedFile);
   }
 
   createActionTest() {
     const destPath = `${this.topLevelPath}/${this.options.path}`;
-    const testFile = this.fs.read(`${destPath}/creators.test.js`, { defaults: '' });
+    const fileDefaults = t.creatorTestFile(this.options.path);
+    const defaultContent = fileDefaults.head + '\n' + fileDefaults.foot;
+    const testFile = this.fs.read(`${destPath}/creators.test.js`, { defaults: defaultContent });
 
-    const firstTestIndex = testFile.indexOf(`\n  describe(`);
-    const endIndex = testFile.lastIndexOf(`});`);
-
-    let testHead, extractedTests, testFoot;
-    if (firstTestIndex === -1) {
-      const fileDefaults = t.creatorTestFile(this.options.path);
-      testHead = fileDefaults.head;
-      testFoot = fileDefaults.foot;
-      extractedTests = '';
-
-    } else {
-      [testHead, extractedTests, testFoot] = testFile.splitAt(firstTestIndex, endIndex);
-    }
+    const fileParts = extractFileParts(testFile, r.describeActionTest, r.combineEnd);
 
     const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
     const newTest = ejs.render(
@@ -110,13 +94,9 @@ class ActionGenerator extends Generator implements Zwenerator {
       }
     );
 
-    const splitString = '\n  describe';
-    const updatedTests = (extractedTests + '\n' + newTest)
-      .split(splitString)
-      .sort()
-      .join(splitString);
+    const updatedFile = addAlphabeticallyAndCombine(fileParts, newTest, false, '\n\n');
 
-    this.fs.write(`${destPath}/creators.test.js`, testHead + updatedTests + testFoot);
+    this.fs.write(`${destPath}/creators.test.js`, updatedFile);
   }
 
   createTypeFiles() {

@@ -64,5 +64,5 @@ String.prototype.splitAt =
 String.prototype.replaceNewLine =
   String.prototype.replaceNewLine ||
   function replaceNewLine(this : string) {
-    return this.replace(/\n\n?$/, '');
+    return this.replace(/\n\n?$/, '').replace(/^\n\n?/, '');
   }

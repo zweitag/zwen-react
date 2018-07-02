@@ -14,9 +14,6 @@ module.exports = {
   },
 
   // reducers
-  exportDefaultCombine() {
-    return `export default combineReducers({`;
-  },
   exportCombine(path) {
     return `  ${path},`;
   },

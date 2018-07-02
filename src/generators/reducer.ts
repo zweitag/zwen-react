@@ -4,7 +4,6 @@ import { Zwenerator, GeneratorOptions } from '../types';
 import { addAlphabeticallyAndCombine, extractFileParts } from '../utils';
 import * as t from './templates/templateStrings';
 import * as r from './templates/regex';
-import * as m from './templates/reducers/getMarkers';
 
 const PATH_PREFIX = 'reducers';
 

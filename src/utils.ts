@@ -4,7 +4,12 @@ interface fileParts {
   after? : string,
 }
 
-export const addAlphabeticallyAndCombine = (fileParts : fileParts, addition : string, wrapEmpty : boolean = true) => {
+export const addAlphabeticallyAndCombine = (
+  fileParts : fileParts,
+  addition : string,
+  wrapEmpty : boolean = true,
+  separator : string = '\n',
+) => {
   let newFile = '';
   const wrapperLines = wrapEmpty ? '\n\n' : '\n';
 
@@ -16,7 +21,7 @@ export const addAlphabeticallyAndCombine = (fileParts : fileParts, addition : st
     newFile += fileParts.before + wrapperLines;
   }
 
-  newFile += fileParts.extracts.join('\n');
+  newFile += fileParts.extracts.join(separator);
 
   if (fileParts.after) {
     newFile += wrapperLines + fileParts.after;
@@ -47,7 +52,16 @@ export function extractFileParts(file : string, extractTerm : RegExp, endTerm? :
 
   const firstMatch = file.search(extr);
   if (firstMatch === -1) {
-    parts.before = file.replaceNewLine();
+    if (endTerm) {
+      const splitTerm = new RegExp(`(?=${endTerm.source})`);
+      const [before, after] = file.split(splitTerm);
+      parts.before = before;
+      parts.after = after;
+
+    } else {
+      parts.before = file.replaceNewLine();
+    }
+
     return parts;
   }
 
