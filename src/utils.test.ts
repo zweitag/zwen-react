@@ -33,7 +33,7 @@ describe('utils', () => {
 
       const parts = utils.extractFileParts(testFile, extractTerm);
 
-      expect(parts).toHaveProperty('before', 'abc abc');
+      expect(parts).toHaveProperty('before', 'abc abc ');
 
     });
 
@@ -44,7 +44,7 @@ describe('utils', () => {
       const parts = utils.extractFileParts(testFile, extractTerm);
 
       expect(parts).toHaveProperty('extracts');
-      expect(parts.extracts).toEqual(['abc erty', 'abc sdd', 'abc ywe']);
+      expect(parts.extracts).toEqual(['abc erty ', 'abc sdd ', 'abc ywe']);
     });
 
     it('should extract the text after and including the end term', () => {
