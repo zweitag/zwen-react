@@ -26,10 +26,11 @@ export function extractFileParts(file : string, extractTerm : RegExp, endTerm? :
 
   const firstMatch = file.search(extr);
   if (firstMatch === -1) {
+    parts.before = file.trim();
     return parts;
   }
 
-  parts.before = file.substr(0, firstMatch);
+  parts.before = file.substr(0, firstMatch).trim();
   parts.extracts = [];
 
   const firstResult = extr.exec(file);
@@ -43,7 +44,7 @@ export function extractFileParts(file : string, extractTerm : RegExp, endTerm? :
 
       if (result) {
         const nextIndex = result.index;
-        parts.extracts.push(file.substring(prevIndex, nextIndex));
+        parts.extracts.push(file.substring(prevIndex, nextIndex).trim());
         prevIndex = nextIndex;
 
       } else {
@@ -55,8 +56,8 @@ export function extractFileParts(file : string, extractTerm : RegExp, endTerm? :
           [lastPart, after] = lastPart.split(splitTerm);
         }
 
-        parts.extracts.push(lastPart);
-        parts.after = after;
+        parts.extracts.push(lastPart.trim());
+        parts.after = after ? after.trim() : '';
 
         hasResults = false;
       }

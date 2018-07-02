@@ -4,13 +4,15 @@ import * as utils from './utils';
 
 describe('utils', () => {
   describe('extractFileParts', () => {
-    it('should return an empty object if the extraction term does not match', () => {
+    it('should return the test file as "before" if the extraction term does not match', () => {
       const testFile = 'abc123';
       const extractTerm = /qwe/;
 
       const parts = utils.extractFileParts(testFile, extractTerm);
 
-      expect(parts).toEqual({});
+      expect(parts).toEqual({
+        before: 'abc123',
+      });
     });
 
     it('should extract the text before the extraction term', () => {
@@ -19,7 +21,7 @@ describe('utils', () => {
 
       const parts = utils.extractFileParts(testFile, extractTerm);
 
-      expect(parts).toHaveProperty('before', 'abc abc ');
+      expect(parts).toHaveProperty('before', 'abc abc');
 
     });
 
@@ -30,7 +32,7 @@ describe('utils', () => {
       const parts = utils.extractFileParts(testFile, extractTerm);
 
       expect(parts).toHaveProperty('extracts');
-      expect(parts.extracts).toEqual(['abc erty ', 'abc sdd ', 'abc ywe']);
+      expect(parts.extracts).toEqual(['abc erty', 'abc sdd', 'abc ywe']);
     });
 
     it('should extract the text after and including the end term', () => {
@@ -55,13 +57,13 @@ describe('utils', () => {
       const firstExtract = parts.extracts ? parts.extracts[0] : '';
       const secondExtract = parts.extracts ? parts.extracts[1] : '';
 
-      expect(parts).toHaveProperty('before', `import * as t from '@/actions/types';\n\n`);
+      expect(parts).toHaveProperty('before', `import * as t from '@/actions/types';`);
       expect(parts).toHaveProperty('extracts');
       expect(parts.extracts).toHaveLength(2);
 
-      expect(firstExtract).toBe(`export * from './test';\n`);
+      expect(firstExtract).toBe(`export * from './test';`);
       expect(secondExtract).toBe(`export * from './ui';`);
-      expect(parts).toHaveProperty('after', `\n\nexport const MY_TYPE = 'types/MY_TYPE';`)
+      expect(parts).toHaveProperty('after', `export const MY_TYPE = 'types/MY_TYPE';`)
     });
   });
 });

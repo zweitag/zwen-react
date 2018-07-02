@@ -61,7 +61,7 @@
   "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
     "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
-    "prepare": "npm run test:once && rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
+    "prepare": "npm run test && rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
     "test": "node_modules/.bin/mocha --require ts-node/register \"src/**/*.test.ts\""
   },
   "types": "lib/index.d.ts"
