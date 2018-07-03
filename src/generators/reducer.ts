@@ -1,7 +1,7 @@
 import * as Generator from 'yeoman-generator'
 
 import { Zwenerator, GeneratorOptions } from '../types';
-import { addAlphabeticallyAndCombine, extractFileParts } from '../utils';
+import { addAlphabetically, extractFileParts } from '../utils';
 import * as t from './templates/templateStrings';
 import * as r from './templates/regex';
 
@@ -29,12 +29,12 @@ class ReducerGenerator extends Generator implements Zwenerator {
   updateTopLevel() {
     const indexFile = this.fs.read(`${this.topLevelPath}/index.js`, { defaults: '' });
     const indexFileParts = extractFileParts(indexFile, r.exportDefaultAs);
-    const updatedIndexFile = addAlphabeticallyAndCombine(indexFileParts, t.exportDefaultAs(this.filePath[0]));
+    const updatedIndexFile = addAlphabetically(indexFileParts, t.exportDefaultAs(this.filePath[0]));
     this.fs.write(`${this.topLevelPath}/index.js`, updatedIndexFile);
 
     const selectorFile = this.fs.read(`${this.topLevelPath}/selectors.js`, { defaults: '' });
     const selectorFileParts = extractFileParts(selectorFile, r.exportAll);
-    const updatedSelectorFile = addAlphabeticallyAndCombine(selectorFileParts, t.exportAll(this.filePath[0]));
+    const updatedSelectorFile = addAlphabetically(selectorFileParts, t.exportAll(this.filePath[0]));
     this.fs.write(`${this.topLevelPath}/selectors.js`, updatedSelectorFile);
   }
 
@@ -56,13 +56,13 @@ class ReducerGenerator extends Generator implements Zwenerator {
         const file = this.fs.read(`${currentPath}/index.js`);
         if (!file.includes(t.defaultImport(subPath))) {
           const importParts = extractFileParts(file, r.importDefault, r.exportDefaultCombine);
-          const fileWithImports = addAlphabeticallyAndCombine(importParts, t.defaultImport(subPath));
+          const fileWithImports = addAlphabetically(importParts, t.defaultImport(subPath));
 
           const combinedParts = extractFileParts(fileWithImports, r.exportCombine, r.combineEnd)
-          const fileWithCombinedReducer = addAlphabeticallyAndCombine(combinedParts, t.exportCombine(subPath), false);
+          const fileWithCombinedReducer = addAlphabetically(combinedParts, t.exportCombine(subPath), '\n');
 
           const exportParts = extractFileParts(fileWithCombinedReducer, r.exportAll);
-          const updatedFile = addAlphabeticallyAndCombine(exportParts, t.exportAll(subPath));
+          const updatedFile = addAlphabetically(exportParts, t.exportAll(subPath));
 
           this.fs.write(`${currentPath}/index.js`, updatedFile);
         }

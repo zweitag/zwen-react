@@ -3,7 +3,6 @@ import './prototypes';
 import { Command, flags } from '@oclif/command';
 import * as path from 'path';
 import { GeneratorOptions } from './types';
-import scaffoldTypes from './scaffoldTypes';
 
 const yeoman = require('yeoman-environment');
 const memFs = require('mem-fs');
@@ -20,7 +19,11 @@ class Zwen extends Command {
   static args = [
     {
       name: 'scaffold_type',
-      options: scaffoldTypes,
+      options: [
+        'action',
+        'component',
+        'reducer',
+      ],
       required: true,
       description: 'What do you want to generate?',
     },

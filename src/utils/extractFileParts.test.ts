@@ -1,28 +1,15 @@
 import * as expect from 'jest-matchers';
 import './prototypes';
 
-import * as utils from './utils';
+import extractFileParts from './extractFileParts';
 
 describe('utils', () => {
-  describe('addAlphabeticallyAndCombine', () => {
-    it('should add the addition to the file extracts', () => {
-      const testFileParts = {
-        before: 'testLine',
-        extracts: ['abc', 'def', 'qwe'],
-        after: 'lastLine',
-      };
-      const addition = 'asd';
-      const result = utils.addAlphabeticallyAndCombine(testFileParts, addition);
-      expect(result).toBe(`testLine\n\nabc\nasd\ndef\nqwe\n\nlastLine\n`);
-    });
-  });
-
   describe('extractFileParts', () => {
     it('should return the test file as "before" if the extraction term does not match', () => {
       const testFile = 'abc123';
       const extractTerm = /qwe/;
 
-      const parts = utils.extractFileParts(testFile, extractTerm);
+      const parts = extractFileParts(testFile, extractTerm);
 
       expect(parts).toHaveProperty('before', 'abc123');
     });
@@ -31,7 +18,7 @@ describe('utils', () => {
       const testFile = 'abc abc qwe';
       const extractTerm = /qwe/;
 
-      const parts = utils.extractFileParts(testFile, extractTerm);
+      const parts = extractFileParts(testFile, extractTerm);
 
       expect(parts).toHaveProperty('before', 'abc abc ');
 
@@ -41,7 +28,7 @@ describe('utils', () => {
       const testFile = 'qwe abc erty abc sdd abc ywe';
       const extractTerm = /abc/;
 
-      const parts = utils.extractFileParts(testFile, extractTerm);
+      const parts = extractFileParts(testFile, extractTerm);
 
       expect(parts).toHaveProperty('extracts');
       expect(parts.extracts).toEqual(['abc erty ', 'abc sdd ', 'abc ywe']);
@@ -52,7 +39,7 @@ describe('utils', () => {
       const extractTerm = /qwe/;
       const endTerm = /ert/;
 
-      const parts = utils.extractFileParts(testFile, extractTerm, endTerm);
+      const parts = extractFileParts(testFile, extractTerm, endTerm);
 
       expect(parts).toHaveProperty('after', 'ert yui');
     });
@@ -65,7 +52,7 @@ describe('utils', () => {
       const extractTerm = /export \* from \'\.\//;
       const endTerm = /\n\n/;
 
-      const parts = utils.extractFileParts(testFile, extractTerm, endTerm);
+      const parts = extractFileParts(testFile, extractTerm, endTerm);
       const firstExtract = parts.extracts ? parts.extracts[0] : '';
       const secondExtract = parts.extracts ? parts.extracts[1] : '';
 

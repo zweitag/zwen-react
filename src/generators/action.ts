@@ -4,7 +4,6 @@ import * as ejs from 'ejs';
 import { Zwenerator, GeneratorOptions } from '../types';
 import {
   addAlphabetically,
-  addAlphabeticallyAndCombine,
   extractFileParts,
 } from '../utils';
 import * as r from './templates/regex';
@@ -43,14 +42,14 @@ class ActionGenerator extends Generator implements Zwenerator {
       const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
       const fileParts = extractFileParts(indexFile, r.exportAll);
       const newExport = lastLevel ? 'creators' : subPath;
-      const updatedCreatorsFile = addAlphabeticallyAndCombine(fileParts, t.exportAll(newExport));
+      const updatedCreatorsFile = addAlphabetically(fileParts, t.exportAll(newExport));
 
       this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile);
 
       if (this.withActionType && !lastLevel) {
         const typesFile = this.fs.read(`${currentPath}/types.js`, { defaults: '' });
         const typeFileParts = extractFileParts(typesFile, r.exportAll);
-        const updatedTypesFile = addAlphabeticallyAndCombine(typeFileParts, t.exportAll(`${subPath}/types`));
+        const updatedTypesFile = addAlphabetically(typeFileParts, t.exportAll(`${subPath}/types`));
         this.fs.write(`${currentPath}/types.js`, updatedTypesFile);
       }
 
@@ -69,10 +68,10 @@ class ActionGenerator extends Generator implements Zwenerator {
         ACTION_NAME: this.options.fileName,
         ACTION_TYPE: 't.' + (this.withActionType ? this.options.fileName.toConstantCase() : 'ACTION_TYPE'),
       }
-    ).trim();
+    ).removeNewLines();
 
     const fileParts = extractFileParts(creatorsFile, r.exportAction);
-    const updatedFile = addAlphabeticallyAndCombine(fileParts, newCreator, true, '\n\n');
+    const updatedFile = addAlphabetically(fileParts, newCreator, '\n\n', '\n\n');
 
     this.fs.write(`${destPath}/creators.js`, updatedFile);
   }
@@ -92,9 +91,9 @@ class ActionGenerator extends Generator implements Zwenerator {
         ACTION_NAME: this.options.fileName,
         ACTION_TYPE: this.withActionType ? this.options.fileName.toConstantCase() : 'ACTION_TYPE',
       }
-    );
+    ).removeNewLines();
 
-    const updatedFile = addAlphabeticallyAndCombine(fileParts, newTest, false, '\n\n');
+    const updatedFile = addAlphabetically(fileParts, newTest, '\n', '\n\n');
 
     this.fs.write(`${destPath}/creators.test.js`, updatedFile);
   }
@@ -103,8 +102,9 @@ class ActionGenerator extends Generator implements Zwenerator {
     if (this.withActionType) {
       const destPath = `${this.topLevelPath}/${this.options.path}`;
       const typesFile = this.fs.read(`${destPath}/types.js`, { defaults: '' });
+      const fileParts = extractFileParts(typesFile, r.exportType, r.doubleNewLine);
       const newType = t.exportType(this.options.fileName.toConstantCase(), this.options.path);
-      const updatedTypesFile = addAlphabetically(typesFile, newType);
+      const updatedTypesFile = addAlphabetically(fileParts, newType);
 
       this.fs.write(`${destPath}/types.js`, updatedTypesFile);
     }

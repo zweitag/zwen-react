@@ -8,6 +8,9 @@ module.exports = {
   combineEnd: /\n}\);/,
 
   exportAction: /export const \w* = \(.*\) =>/,
+  exportType: /export const \w* = \'(\w+(\/\w+)*)\';/,
 
   describeActionTest: /\n  describe\(\'\w*\', \(\) => {\n/,
+
+  doubleNewLine: /\n\n/,
 };

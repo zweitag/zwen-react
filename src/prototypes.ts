@@ -27,7 +27,7 @@ Array.prototype.pushSort =
   }
 
 interface String {
-  replaceNewLine() : string,
+  removeNewLines() : string,
   toCamelCase() : string,
   toConstantCase() : string,
   toPascalCase() : string,
@@ -61,8 +61,8 @@ String.prototype.splitAt =
       this.slice(endIndex)].filterEmptyStrings();
   }
 
-String.prototype.replaceNewLine =
-  String.prototype.replaceNewLine ||
-  function replaceNewLine(this : string) {
+String.prototype.removeNewLines =
+  String.prototype.removeNewLines ||
+  function removeNewLines(this : string) {
     return this.replace(/\n\n?$/, '').replace(/^\n\n?/, '');
   }
