@@ -1,5 +1,5 @@
 import * as expect from 'jest-matchers';
-import './prototypes';
+import '../prototypes';
 
 import addAlphabetically from './addAlphabetically';
 
@@ -13,7 +13,29 @@ describe('utils', () => {
       };
       const addition = 'asd';
       const result = addAlphabetically(testFileParts, addition);
+      expect(result).toBe(`testLine\nabc\nasd\ndef\nqwe\nlastLine\n`);
+    });
+
+    it('should wrap the extracts accordingly', () => {
+      const testFileParts = {
+        before: 'testLine',
+        extracts: ['abc', 'def', 'qwe'],
+        after: 'lastLine',
+      };
+      const addition = 'asd';
+      const result = addAlphabetically(testFileParts, addition, '\n\n');
       expect(result).toBe(`testLine\n\nabc\nasd\ndef\nqwe\n\nlastLine\n`);
+    });
+
+    it('should separate the extracts accordingly', () => {
+      const testFileParts = {
+        before: 'testLine',
+        extracts: ['abc', 'def', 'qwe'],
+        after: 'lastLine',
+      };
+      const addition = 'asd';
+      const result = addAlphabetically(testFileParts, addition, undefined, '\n\n');
+      expect(result).toBe(`testLine\nabc\n\nasd\n\ndef\n\nqwe\nlastLine\n`);
     });
   });
 });
