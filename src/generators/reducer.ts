@@ -56,13 +56,13 @@ class ReducerGenerator extends Generator implements Zwenerator {
         const file = this.fs.read(`${currentPath}/index.js`);
         if (!file.includes(t.defaultImport(subPath))) {
           const importParts = extractFileParts(file, r.importDefault, r.exportDefaultCombine);
-          const fileWithImports = addAlphabetically(importParts, t.defaultImport(subPath));
+          const fileWithImports = addAlphabetically(importParts, t.defaultImport(subPath), '\n\n');
 
           const combinedParts = extractFileParts(fileWithImports, r.exportCombine, r.combineEnd)
           const fileWithCombinedReducer = addAlphabetically(combinedParts, t.exportCombine(subPath), '\n');
 
           const exportParts = extractFileParts(fileWithCombinedReducer, r.exportAll);
-          const updatedFile = addAlphabetically(exportParts, t.exportAll(subPath));
+          const updatedFile = addAlphabetically(exportParts, t.exportAll(subPath), '\n\n');
 
           this.fs.write(`${currentPath}/index.js`, updatedFile);
         }

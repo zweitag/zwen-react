@@ -1,7 +1,7 @@
 {
   "name": "zwen-react",
   "description": "Code generator CLI for projects using react and redux",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "author": "Zweitag GmbH @zweitag",
   "bin": {
     "zwen": "./bin/run"
@@ -59,7 +59,7 @@
   },
   "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
-    "dev": "NODE_ENV='development' && ./bin/run",
+    "dev": "export NODE_ENV='development' && ./bin/run",
     "test": "node_modules/.bin/mocha --require ts-node/register \"src/**/*.test.ts\"",
     "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
     "prepare": "npm test && npm run build"
