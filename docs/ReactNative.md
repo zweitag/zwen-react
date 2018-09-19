@@ -203,3 +203,77 @@ export default StyleSheet.create({
   },
 });
 ```
+
+## Best Practices
+
+### StatusBar
+
+If you want to change the color of the Android and iOS StatusBar, you can’t easily add some styling and you’re done. Instead you have to build your own `StatusBar` component by using a customized version from React Native.
+
+**Important**: If you use the `Container` component from [NativeBase](http://docs.nativebase.io/Components.html#anatomy-headref), your newly built `DefaultStatusBar` needs to be placed outside of it.
+
+```jsx
+// App.js
+
+const App = () => (
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <View style={{ flex: 1 }}>
+        <Root>
+          <DefaultStatusBar />
+          <Container>
+            <AlertListener />
+            <AppNavigator />
+            <Loader />
+          </Container>
+        </Root>
+      </View>
+    </PersistGate>
+  </Provider>
+);
+```
+
+Because iOS doesn’t have a concept of a StatusBar background, you need a wrapper `View` to achieve this in a cross-platform way.
+
+```jsx
+// DefaultStatusBar.js
+
+import React from 'react';
+import {
+  Platform,
+  StatusBar,
+  View,
+} from 'react-native';
+
+import * as colors from '@/styles/colors';
+
+const STATUSBAR_HEIGHT = Platform.OS === 'ios' ? 20 : StatusBar.currentHeight;
+
+const DefaultStatusBar = () => (
+  <View style={{ height: STATUSBAR_HEIGHT, backgroundColor: colors.accent }}>
+    <StatusBar
+      backgroundColor={colors.accent}
+      barStyle='light-content'
+      translucent={true}
+    />
+  </View>
+);
+
+export default DefaultStatusBar;
+```
+
+**Important**: If you use the `Header` component from [NativeBase](http://docs.nativebase.io/Components.html#header-def-headref), you need to set two additional props, otherwise the text- and background-color aren’t rendered correctly.
+
+```jsx
+// CustomerDetailsHeader.js
+
+const CustomerDetailsHeader = () => (
+  <Header
+    androidStatusBarColor={colors.accent}
+    iosBarStyle='light-content'
+    style={headerStyles.header}
+  >
+    …
+  </Header>
+);
+```
