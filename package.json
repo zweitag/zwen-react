@@ -3,6 +3,10 @@
   "description": "Code generator CLI for projects using react and redux",
   "version": "0.7.1",
   "author": "Zweitag GmbH @zweitag",
+  "contributors": [
+    "Alex Kott <alexander.kott@zweitag.de>",
+    "Johannes Hollekamp <johannes.hollekamp@zweitag.de"
+  ],
   "bin": {
     "zwen": "./bin/run"
   },
@@ -15,7 +19,7 @@
     "constant-case": "^2.0.0",
     "ejs": "^2.6.1",
     "pascal-case": "^2.0.1",
-    "yeoman-environment": "^2.2.0",
+    "yeoman-environment": "^2.3.4",
     "yeoman-generator": "^2.0.5"
   },
   "devDependencies": {
