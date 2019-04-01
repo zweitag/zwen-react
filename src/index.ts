@@ -1,70 +1,44 @@
 import '@babel/polyfill';
 import './prototypes';
 
-import * as path from 'path';
 import yeoman from 'yeoman-environment';
+import chalk from 'chalk';
 
-import { GeneratorOptions } from './types';
+import { registeredGenerators } from './generators';
+import logger from './logger';
+import { GeneratorOptions, Flags } from './types';
 
-const { version: pkgVersion } = require('../package.json');
+const { bold, underline } = chalk;
 
 const defaultConfig = {
   srcDir: 'src',
 };
+// TODO: read user config from .zwen file
+const config = <GeneratorOptions> {
+  ...defaultConfig,
+};
 
-export default function run(args, flags) {
+module.exports = (args: Array<string>, flags: Flags) => {
+  const [command] = args;
+
   if (flags.version || flags.v) {
-    console.log(pkgVersion);
+    logger.version();
+    return;
+  }
+  if (flags.help || flags.h || !command) {
+    logger.help();
     return;
   }
 
-  const [command, path] = args;
   const env = yeoman.createEnv();
 
-  const options = <GeneratorOptions> {
-    // ...userConfig,
-    ...flags,
-  };
-
-  switch (command) {
-    case 'reducer':
-      env.register(require.resolve('./generators/reducer'), 'zwen:reducer');
-      env.run('zwen:reducer', options);
-      return;
-
-    default:
-      console.log('Sorry, I don\'t understand.');
+  if (registeredGenerators.includes(command)) {
+    env.register(require.resolve(`./generators/${command}`), `zwen:${command}`);
+    env.run(`zwen:${command}`, config);
+    return;
   }
-};
 
-/*
-static usage = '[SCAFFOLD_TYPE] [PATH_WITH_NAME] [OPTIONS]';
-  static examples = [
-    '$ zwen reducer filter/date/selectedWeek',
-    '$ zwen component ui/closeButton -c',
-  ];
-  static args = [
-    {
-      name: 'scaffold_type',
-      options: [
-        'action',
-        'component',
-        'reducer',
-      ],
-      required: true,
-      description: 'What do you want to generate?',
-    },
-    {
-      name: 'path_with_name',
-      required: true,
-      description: 'Where should the new scaffold be placed?'
-    },
-  ];
-
-  static flags = {
-    classComp: flags.boolean({
-      char: 'c',
-      description: 'Will create a class component where you can use React\'s lifecycle methods.',
-    }),
-  };
-*/
+  logger.log(`Unknown command ${bold.red(command)}.`);
+  logger.log(`Available options are ${bold.green(registeredGenerators.toString('|', '(', ')'))}.`);
+  logger.log(`Use ${underline('zwen --help')} for more info.`);
+}

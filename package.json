@@ -7,13 +7,26 @@
     "Alex Kott <alexander.kott@zweitag.de>",
     "Johannes Hollekamp <johannes.hollekamp@zweitag.de"
   ],
+  "main": "lib",
   "bin": {
     "zwen": "./bin/run"
   },
+  "homepage": "https://github.com/zweitag/zwen-react",
+  "keywords": [
+    "zweitag",
+    "react",
+    "redux",
+    "generator",
+    "cli",
+    "architecture"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/zweitag/zwen-react",
   "bugs": "https://github.com/zweitag/zwen-react/issues",
   "dependencies": {
     "@babel/polyfill": "^7.4.0",
     "camel-case": "^3.0.0",
+    "chalk": "^2.4.2",
     "constant-case": "^2.0.0",
     "ejs": "^2.6.1",
     "minimist": "^1.2.0",
@@ -37,31 +50,6 @@
     "@types/node": "^11.12.2",
     "@types/yeoman-generator": "^3.1.1"
   },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/bin",
-    "/lib"
-  ],
-  "plugins": [
-    "@oclif/plugin-help"
-  ],
-  "homepage": "https://github.com/zweitag/zwen-react",
-  "keywords": [
-    "zweitag",
-    "react",
-    "redux",
-    "generator",
-    "cli",
-    "architecture"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "oclif": {
-    "bin": "zwen"
-  },
-  "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
     "babel": "babel src -d lib --extensions .ts --copy-files --ignore src/**/*.test.js",
     "clear": "rm -rf lib",
@@ -70,6 +58,5 @@
     "build": "export NODE_ENV=production && npm run clear && npm run babel",
     "test": "jest src",
     "prepare": "npm test && npm run build"
-  },
-  "types": "lib/index.d.ts"
+  }
 }

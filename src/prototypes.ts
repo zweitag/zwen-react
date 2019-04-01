@@ -5,6 +5,7 @@ const pascalCase = require('pascal-case');
 interface Array<T> {
   filterEmptyStrings() : Array<T>
   pushSort(value : any, appendix? : any) : Array<T>
+  toString(delimiter?: string, prefix?: string, suffix?: string) : string
 }
 
 Array.prototype.filterEmptyStrings =
@@ -25,6 +26,11 @@ Array.prototype.pushSort =
     }
     return newArr;
   }
+
+Array.prototype.toString = function toString(this: Array<any>, delimiter = ',', prefix = '', suffix = '') {
+  const reducedArray = this.reduce((str, cur) => str + delimiter + cur);
+  return `${prefix}${reducedArray}${suffix}`;
+}
 
 interface String {
   removeNewLines() : string,

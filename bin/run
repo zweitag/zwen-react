@@ -7,4 +7,4 @@ const argv = require('minimist')(process.argv.slice(2));
 const { _: args } = argv;
 const flags = { ...argv, _: undefined };
 
-require('..')(args, flags);
+require('../lib')(args, flags);
