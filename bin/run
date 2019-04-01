@@ -1,13 +1,10 @@
 #!/usr/bin/env node
-
-const fs = require('fs');
-const path = require('path');
-const isDev = process.env.NODE_ENV === 'development';
-
-if (isDev) {
-  require('ts-node/register');
+if (!global._babelPolyfill) {
+  require('@babel/polyfill');
 }
 
-require(`../${isDev ? 'src' : 'lib'}`)
-  .run()
-  .catch(require('@oclif/errors/handle'));
+const argv = require('minimist')(process.argv.slice(2));
+const { _: args } = argv;
+const flags = { ...argv, _: undefined };
+
+require('..')(args, flags);

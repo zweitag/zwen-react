@@ -12,29 +12,29 @@
   },
   "bugs": "https://github.com/zweitag/zwen-react/issues",
   "dependencies": {
-    "@oclif/command": "^1",
-    "@oclif/config": "^1",
-    "@oclif/plugin-help": "^2.0.5",
+    "@babel/polyfill": "^7.4.0",
     "camel-case": "^3.0.0",
     "constant-case": "^2.0.0",
     "ejs": "^2.6.1",
+    "jest": "^24.5.0",
     "pascal-case": "^2.0.1",
     "yeoman-environment": "^2.3.4",
-    "yeoman-generator": "^2.0.5"
+    "yeoman-generator": "^3.2.0"
   },
   "devDependencies": {
-    "@types/camelcase": "^4.1.0",
-    "@types/ejs": "^2.6.0",
-    "@types/jest-matchers": "^20.0.1",
-    "@types/mem-fs": "^1.1.1",
-    "@types/mem-fs-editor": "^4.0.1",
-    "@types/node": "^10",
-    "@types/yeoman-generator": "^2.0.3",
-    "jest-matchers": "^20.0.3",
-    "mocha": "^5.2.0",
-    "ts-node": "^6",
-    "tslib": "^1",
-    "typescript": "^2.9"
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.4.0",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.0",
+    "@babel/preset-env": "^7.4.2",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/camelcase": "^5.2.0",
+    "@types/ejs": "^2.6.3",
+    "@types/jest-matchers": "^20.0.2",
+    "@types/mem-fs": "^1.1.2",
+    "@types/mem-fs-editor": "^5.1.1",
+    "@types/node": "^11.12.2",
+    "@types/yeoman-generator": "^3.1.1"
   },
   "engines": {
     "node": ">=8.0.0"
@@ -62,9 +62,11 @@
   },
   "repository": "https://github.com/zweitag/zwen-react",
   "scripts": {
+    "babel": "babel src -d lib --extensions .ts --copy-files --ignore src/**/*.test.js",
+    "clear": "rm -rf lib",
+    "copy": "cp -R src/generators/templates lib/generators/templates/",
     "dev": "export NODE_ENV='development' && ./bin/run",
-    "test": "node_modules/.bin/mocha --require ts-node/register \"src/**/*.test.ts\"",
-    "build": "rm -rf lib && tsc && cp -R src/generators/templates lib/generators/templates/",
+    "build": "export NODE_ENV=production && npm run clear && npm run babel",
     "prepare": "npm test && npm run build"
   },
   "types": "lib/index.d.ts"
