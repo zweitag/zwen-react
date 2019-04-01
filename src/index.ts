@@ -1,17 +1,44 @@
+import '@babel/polyfill';
 import './prototypes';
 
-import { Command, flags } from '@oclif/command';
 import * as path from 'path';
+import yeoman from 'yeoman-environment';
+
 import { GeneratorOptions } from './types';
 
-const yeoman = require('yeoman-environment');
-const memFs = require('mem-fs');
-const memFsEditor = require('mem-fs-editor');
+const { version: pkgVersion } = require('../package.json');
 
-const fs = memFsEditor.create(memFs.create());
+const defaultConfig = {
+  srcDir: 'src',
+};
 
-class Zwen extends Command {
-  static usage = '[SCAFFOLD_TYPE] [PATH_WITH_NAME] [OPTIONS]';
+export default function run(args, flags) {
+  if (flags.version || flags.v) {
+    console.log(pkgVersion);
+    return;
+  }
+
+  const [command, path] = args;
+  const env = yeoman.createEnv();
+
+  const options = <GeneratorOptions> {
+    // ...userConfig,
+    ...flags,
+  };
+
+  switch (command) {
+    case 'reducer':
+      env.register(require.resolve('./generators/reducer'), 'zwen:reducer');
+      env.run('zwen:reducer', options);
+      return;
+
+    default:
+      console.log('Sorry, I don\'t understand.');
+  }
+};
+
+/*
+static usage = '[SCAFFOLD_TYPE] [PATH_WITH_NAME] [OPTIONS]';
   static examples = [
     '$ zwen reducer filter/date/selectedWeek',
     '$ zwen component ui/closeButton -c',
@@ -40,33 +67,4 @@ class Zwen extends Command {
       description: 'Will create a class component where you can use React\'s lifecycle methods.',
     }),
   };
-
-  async run() {
-    const defaultConfig = {
-      srcDir: 'src',
-    };
-    const userConfig = fs.readJSON(path.join(process.cwd(), '.zwen'), defaultConfig);
-
-    const { args, flags } = this.parse(Zwen);
-    const env = yeoman.createEnv();
-    const generatorPathArr = ['.', 'generators'];
-    const namespaceArr = ['zwen'];
-    const options = <GeneratorOptions> {
-      ...userConfig,
-      ...flags,
-    };
-
-    generatorPathArr.push(args.scaffold_type);
-    namespaceArr.push(args.scaffold_type);
-    options.path = path.parse(args.path_with_name).dir;
-    options.fileName = path.parse(args.path_with_name).name;
-
-    const namespace = namespaceArr.join(':');
-    const generatorPath =generatorPathArr.join('/');
-
-    env.register(require.resolve(generatorPath), namespace);
-    env.run(namespace, options);
-  }
-}
-
-export = Zwen;
+*/

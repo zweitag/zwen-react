@@ -111,4 +111,4 @@ class ActionGenerator extends Generator implements Zwenerator {
   }
 }
 
-export = ActionGenerator;
+export default ActionGenerator;

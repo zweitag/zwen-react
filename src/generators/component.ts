@@ -61,4 +61,4 @@ class ComponentGenerator extends Generator implements Zwenerator {
 
 }
 
-export = ComponentGenerator;
+export default ComponentGenerator;

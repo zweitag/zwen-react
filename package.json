@@ -16,7 +16,7 @@
     "camel-case": "^3.0.0",
     "constant-case": "^2.0.0",
     "ejs": "^2.6.1",
-    "jest": "^24.5.0",
+    "minimist": "^1.2.0",
     "pascal-case": "^2.0.1",
     "yeoman-environment": "^2.3.4",
     "yeoman-generator": "^3.2.0"
@@ -28,6 +28,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
     "@babel/preset-typescript": "^7.3.3",
+    "jest": "^24.5.0",
     "@types/camelcase": "^5.2.0",
     "@types/ejs": "^2.6.3",
     "@types/jest-matchers": "^20.0.2",

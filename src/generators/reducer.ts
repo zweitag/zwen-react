@@ -97,4 +97,4 @@ class ReducerGenerator extends Generator implements Zwenerator {
   }
 }
 
-export = ReducerGenerator;
+export default ReducerGenerator;
