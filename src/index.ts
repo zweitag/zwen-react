@@ -1,8 +1,9 @@
 import '@babel/polyfill';
 import './prototypes';
 
-import yeoman from 'yeoman-environment';
+import path from 'path';
 import chalk from 'chalk';
+import yeoman from 'yeoman-environment';
 
 import { registeredGenerators } from './generators';
 import logger from './logger';
@@ -14,18 +15,18 @@ const defaultConfig = {
   srcDir: 'src',
 };
 // TODO: read user config from .zwen file
-const config = <GeneratorOptions> {
+const config = {
   ...defaultConfig,
 };
 
 module.exports = (args: Array<string>, flags: Flags) => {
-  const [command] = args;
+  const [command, destPath] = args;
 
-  if (flags.version || flags.v) {
+  if (flags.version != null || flags.v) {
     logger.version();
     return;
   }
-  if (flags.help || flags.h || !command) {
+  if (flags.help != null || flags.h || !command) {
     logger.help();
     return;
   }
@@ -33,12 +34,25 @@ module.exports = (args: Array<string>, flags: Flags) => {
   const env = yeoman.createEnv();
 
   if (registeredGenerators.includes(command)) {
-    env.register(require.resolve(`./generators/${command}`), `zwen:${command}`);
-    env.run(`zwen:${command}`, config);
-    return;
-  }
+    if (!destPath) {
+      logger.missingArgument('PATH_WITH_NAME');
+      return;
+    }
 
-  logger.log(`Unknown command ${bold.red(command)}.`);
-  logger.log(`Available options are ${bold.green(registeredGenerators.toString('|', '(', ')'))}.`);
-  logger.log(`Use ${underline('zwen --help')} for more info.`);
+    const {name: fileName, dir } = path.parse(destPath);
+
+    // TODO: remove fileName from destDir
+    const options: GeneratorOptions = {
+      ...config,
+      fileName,
+      destDir: dir.split('/').filterEmptyStrings().concat(fileName),
+      classComp: flags.classComp != null || flags.c,
+    }
+
+    env.register(require.resolve(`./generators/${command}`), `zwen:${command}`);
+    env.run(`zwen:${command}`, options);
+
+  } else {
+    logger.unknownCommand(command);
+  }
 }

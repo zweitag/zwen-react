@@ -1,5 +1,5 @@
-import * as Generator from 'yeoman-generator'
-import * as ejs from 'ejs';
+import Generator from 'yeoman-generator'
+import ejs from 'ejs';
 
 import { Zwenerator, GeneratorOptions } from '../types';
 import {
@@ -12,16 +12,19 @@ import * as t from './templates/templateStrings';
 const PATH_PREFIX = 'actions';
 
 class ActionGenerator extends Generator implements Zwenerator {
-  options!: GeneratorOptions;
   topLevelPath!: string;
-  filePath!: Array<string>;
+  destDir!: Array<string>;
+  fileName!: string;
+  path: string;
   withActionType: boolean = true;
 
   constructor(args: Array<string>, options : GeneratorOptions) {
     super(args, options);
-    this.topLevelPath = `${this.options.srcDir}/${PATH_PREFIX}`;
-    this.filePath = this.options.path.split('/').filterEmptyStrings();
-    this.filePath.push(this.options.fileName);
+
+    this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
+    this.fileName = options.fileName;
+    this.destDir = options.destDir;
+    this.path = this.destDir.slice(0, -1).toString('/');
   }
 
   prompting() {
@@ -37,8 +40,8 @@ class ActionGenerator extends Generator implements Zwenerator {
   updateExports() {
     let currentPath = `${this.topLevelPath}/`;
 
-    this.filePath.forEach((subPath : string, index : number) => {
-      const lastLevel = index === this.filePath.length - 1;
+    this.destDir.forEach((subPath : string, index : number) => {
+      const lastLevel = index === this.destDir.length - 1;
       const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
       const fileParts = extractFileParts(indexFile, r.exportAll);
       const newExport = lastLevel ? 'creators' : subPath;
@@ -58,15 +61,15 @@ class ActionGenerator extends Generator implements Zwenerator {
   }
 
   createActionFile() {
-    const destPath = `${this.topLevelPath}/${this.options.path}`;
+    const destPath = `${this.topLevelPath}/${this.path}`;
     const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: t.importAllTypes() });
     const creatorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.ejs`));
 
     const newCreator = ejs.render(
       creatorTemplate,
       {
-        ACTION_NAME: this.options.fileName,
-        ACTION_TYPE: 't.' + (this.withActionType ? this.options.fileName.toConstantCase() : 'ACTION_TYPE'),
+        ACTION_NAME: this.fileName,
+        ACTION_TYPE: 't.' + (this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE'),
       }
     ).removeNewLines();
 
@@ -77,8 +80,8 @@ class ActionGenerator extends Generator implements Zwenerator {
   }
 
   createActionTest() {
-    const destPath = `${this.topLevelPath}/${this.options.path}`;
-    const fileDefaults = t.creatorTestFile(this.options.path);
+    const destPath = `${this.topLevelPath}/${this.path}`;
+    const fileDefaults = t.creatorTestFile(this.path);
     const defaultContent = fileDefaults.head + '\n' + fileDefaults.foot;
     const testFile = this.fs.read(`${destPath}/creators.test.js`, { defaults: defaultContent });
 
@@ -88,8 +91,8 @@ class ActionGenerator extends Generator implements Zwenerator {
     const newTest = ejs.render(
       testTemplate,
       {
-        ACTION_NAME: this.options.fileName,
-        ACTION_TYPE: this.withActionType ? this.options.fileName.toConstantCase() : 'ACTION_TYPE',
+        ACTION_NAME: this.fileName,
+        ACTION_TYPE: this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE',
       }
     ).removeNewLines();
 
@@ -100,10 +103,10 @@ class ActionGenerator extends Generator implements Zwenerator {
 
   createTypeFiles() {
     if (this.withActionType) {
-      const destPath = `${this.topLevelPath}/${this.options.path}`;
+      const destPath = `${this.topLevelPath}/${this.path}`;
       const typesFile = this.fs.read(`${destPath}/types.js`, { defaults: '' });
       const fileParts = extractFileParts(typesFile, r.exportType, r.doubleNewLine);
-      const newType = t.exportType(this.options.fileName.toConstantCase(), this.options.path);
+      const newType = t.exportType(this.fileName.toConstantCase(), this.path);
       const updatedTypesFile = addAlphabetically(fileParts, newType);
 
       this.fs.write(`${destPath}/types.js`, updatedTypesFile);

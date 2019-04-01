@@ -1,21 +1,24 @@
-import * as Generator from 'yeoman-generator'
+import Generator from 'yeoman-generator'
 
 export interface Flags {
   version: string,
   v: boolean,
   help: string,
   h: boolean,
+  classComp: string,
+  c: boolean,
 }
 
 export interface GeneratorOptions {
-  path: string,
+  destDir: Array<string>,
   fileName: string,
   srcDir: string,
   classComp?: boolean,
 }
 
 export interface Zwenerator extends Generator {
-  filePath: Array<string>,
+  destDir: Array<string>,
+  fileName: string,
   topLevelPath: string,
 }
 

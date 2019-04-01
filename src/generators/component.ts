@@ -1,27 +1,26 @@
-import * as Generator from 'yeoman-generator'
+import Generator from 'yeoman-generator'
 
 import { Zwenerator, GeneratorOptions } from '../types';
 
 const PATH_PREFIX = 'components';
 
 class ComponentGenerator extends Generator implements Zwenerator {
-  options!: GeneratorOptions;
   topLevelPath!: string;
-  filePath!: Array<string>;
+  destDir!: Array<string>;
+  fileName!: string;
+  path: string;
+  classComp: boolean;
   connected: boolean = false;
   withProps: boolean = true;
 
   constructor(args: Array<string>, options : GeneratorOptions) {
     super(args, options);
 
-    this.option('classComp', {
-      description: 'Will create a class component where you can use React\'s lifecycle methods.',
-      alias: '-c',
-    });
-
-    this.topLevelPath = `${this.options.srcDir}/${PATH_PREFIX}`;
-    this.filePath = this.options.path.split('/').filterEmptyStrings();
-    this.filePath.push(this.options.fileName);
+    this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
+    this.fileName = options.fileName;
+    this.destDir = options.destDir;
+    this.path = this.destDir.slice(0, -1).toString('/');
+    this.classComp = options.classComp === true;
   }
 
   prompting() {
@@ -45,9 +44,9 @@ class ComponentGenerator extends Generator implements Zwenerator {
   }
 
   writing() {
-    const destPath = `${this.topLevelPath}/${this.options.path}`;
-    const componentName = this.options.fileName.toPascalCase();
-    const templateName = this.options.classComp ? 'classComp' : 'component';
+    const destPath = `${this.topLevelPath}/${this.path}`;
+    const componentName = this.fileName.toPascalCase();
+    const templateName = this.classComp ? 'classComp' : 'component';
     this.fs.copyTpl(
       this.templatePath(`${PATH_PREFIX}/${templateName}.ejs`),
       this.destinationPath(`${destPath}/${componentName}.js`),
@@ -58,7 +57,6 @@ class ComponentGenerator extends Generator implements Zwenerator {
       }
     );
   }
-
 }
 
 export default ComponentGenerator;

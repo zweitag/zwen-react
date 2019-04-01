@@ -13,6 +13,9 @@ export default {
   version() {
     log(pkgVersion);
   },
+  showHelpCmd() {
+    log(`Use ${underline('zwen --help')} for more info.`);
+  },
   help() {
     log(bold('USAGE'));
     log('  $ zwen [SCAFFOLD_TYPE] [PATH_WITH_NAME] [OPTIONS]');
@@ -32,5 +35,14 @@ export default {
     log(bold('EXAMPLES'));
     log(`  $ zwen reducer filter/date/selectedWeek`);
     log(`  $ zwen component ui/closeButton -c`);
+  },
+  unknownCommand(command: string) {
+    log(`Unknown command: ${bold.red(command)}.`);
+    log(`Available options are: ${bold.green(registeredGenerators.toString('|', '(', ')'))}.`);
+    this.showHelpCmd();
+  },
+  missingArgument(arg: string) {
+    log(`Missing argument: ${bold.red(arg)}`);
+    this.showHelpCmd();
   },
 }
