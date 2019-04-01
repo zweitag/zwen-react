@@ -67,6 +67,7 @@
     "copy": "cp -R src/generators/templates lib/generators/templates/",
     "dev": "export NODE_ENV='development' && ./bin/run",
     "build": "export NODE_ENV=production && npm run clear && npm run babel",
+    "test": "jest src",
     "prepare": "npm test && npm run build"
   },
   "types": "lib/index.d.ts"

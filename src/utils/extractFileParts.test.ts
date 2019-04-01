@@ -1,4 +1,3 @@
-import * as expect from 'jest-matchers';
 import '../prototypes';
 
 import extractFileParts from './extractFileParts';
