@@ -61,7 +61,7 @@ describe('utils', () => {
 
       expect(firstExtract).toBe(`export * from './test';`);
       expect(secondExtract).toBe(`export * from './ui';`);
-      expect(parts).toHaveProperty('after', `export const MY_TYPE = 'types/MY_TYPE';`)
+      expect(parts).toHaveProperty('after', `export const MY_TYPE = 'types/MY_TYPE';`);
     });
   });
 });

@@ -6,9 +6,9 @@ describe('utils', () => {
   describe('addAlphabetically', () => {
     it('should add the addition to the file extracts', () => {
       const testFileParts = {
+        after: 'lastLine',
         before: 'testLine',
         extracts: ['abc', 'def', 'qwe'],
-        after: 'lastLine',
       };
       const addition = 'asd';
       const result = addAlphabetically(testFileParts, addition);
@@ -17,9 +17,9 @@ describe('utils', () => {
 
     it('should wrap the extracts accordingly', () => {
       const testFileParts = {
+        after: 'lastLine',
         before: 'testLine',
         extracts: ['abc', 'def', 'qwe'],
-        after: 'lastLine',
       };
       const addition = 'asd';
       const result = addAlphabetically(testFileParts, addition, '\n\n');
@@ -28,9 +28,9 @@ describe('utils', () => {
 
     it('should separate the extracts accordingly', () => {
       const testFileParts = {
+        after: 'lastLine',
         before: 'testLine',
         extracts: ['abc', 'def', 'qwe'],
-        after: 'lastLine',
       };
       const addition = 'asd';
       const result = addAlphabetically(testFileParts, addition, undefined, '\n\n');

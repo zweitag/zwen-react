@@ -1,15 +1,13 @@
 import '@babel/polyfill';
 import './prototypes';
 
-import path from 'path';
 import chalk from 'chalk';
+import path from 'path';
 import yeoman from 'yeoman-environment';
 
 import { registeredGenerators } from './generators';
 import logger from './logger';
-import { GeneratorOptions, Flags } from './types';
-
-const { bold, underline } = chalk;
+import { Flags, GeneratorOptions } from './types';
 
 const defaultConfig = {
   srcDir: 'src',
@@ -19,7 +17,7 @@ const config = {
   ...defaultConfig,
 };
 
-module.exports = (args: Array<string>, flags: Flags) => {
+module.exports = (args: string[], flags: Flags) => {
   const [command, destPath] = args;
 
   if (flags.version != null || flags.v) {
@@ -44,10 +42,10 @@ module.exports = (args: Array<string>, flags: Flags) => {
     // TODO: remove fileName from destDir
     const options: GeneratorOptions = {
       ...config,
-      fileName,
-      destDir: dir.split('/').filterEmptyStrings().concat(fileName),
       classComp: flags.classComp != null || flags.c,
-    }
+      destDir: dir.split('/').filterEmptyStrings().concat(fileName),
+      fileName,
+    };
 
     env.register(require.resolve(`./generators/${command}`), `zwen:${command}`);
     env.run(`zwen:${command}`, options);
@@ -55,4 +53,4 @@ module.exports = (args: Array<string>, flags: Flags) => {
   } else {
     logger.unknownCommand(command);
   }
-}
+};

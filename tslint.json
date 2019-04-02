@@ -1,3 +1,9 @@
 {
-  "extends": "@oclif/tslint"
+  "extends": "tslint:recommended",
+  "rules": {
+    "arrow-parens": [true, "ban-single-arg-parens"],
+    "interface-name":false,
+    "member-access":false,
+    "quotemark": [true, "single"]
+  }
 }

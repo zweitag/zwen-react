@@ -1,19 +1,19 @@
-import Generator from 'yeoman-generator'
+import Generator from 'yeoman-generator';
 
-import { Zwenerator, GeneratorOptions } from '../types';
+import { GeneratorOptions, Zwenerator } from '../types';
 
 const PATH_PREFIX = 'components';
 
-class ComponentGenerator extends Generator implements Zwenerator {
+export default class ComponentGenerator extends Generator implements Zwenerator {
   topLevelPath!: string;
-  destDir!: Array<string>;
+  destDir!: string[];
   fileName!: string;
   path: string;
   classComp: boolean;
   connected: boolean = false;
   withProps: boolean = true;
 
-  constructor(args: Array<string>, options : GeneratorOptions) {
+  constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
@@ -23,24 +23,24 @@ class ComponentGenerator extends Generator implements Zwenerator {
     this.classComp = options.classComp === true;
   }
 
-  prompting() {
-    return this.prompt({
-      type: 'confirm',
+  async prompting() {
+    const answer1 = await this.prompt({
+      message: 'Do you want the component to be connected to the store?',
       name: 'connected',
-      message: 'Do you want the component to be connected to the store?'
-    }).then(answer => {
-      this.connected = answer.connected;
-
-      if (!answer.connected) {
-        return this.prompt({
-          type: 'confirm',
-          name: 'withProps',
-          message: 'Do you want the component to be set up with props?'
-        }).then(answer => {
-          this.withProps = answer.withProps;
-        });
-      }
+      type: 'confirm',
     });
+
+    this.connected = answer1.connected;
+
+    if (!answer1.connected) {
+      const answer2 = await this.prompt({
+        message: 'Do you want the component to be set up with props?',
+        name: 'withProps',
+        type: 'confirm',
+      });
+
+      this.withProps = answer2.withProps;
+    }
   }
 
   writing() {
@@ -54,9 +54,7 @@ class ComponentGenerator extends Generator implements Zwenerator {
         COMPONENT_NAME: componentName,
         CONNECTED: this.connected,
         WITH_PROPS: this.withProps,
-      }
+      },
     );
   }
 }
-
-export default ComponentGenerator;

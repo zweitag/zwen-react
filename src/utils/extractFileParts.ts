@@ -1,12 +1,12 @@
-import { fileParts } from '../types';
+import { FileParts } from '../types';
 
 export default (
-  file : string,
-  extractTerm : RegExp,
-  endTerm? : RegExp,
-  keepNewLines? : boolean|undefined,
+  file: string,
+  extractTerm: RegExp,
+  endTerm?: RegExp,
+  keepNewLines?: boolean|undefined,
 ) => {
-  const parts : fileParts = { before: '', extracts: [], after: '' };
+  const parts: FileParts = { before: '', extracts: [], after: '' };
   const extr = new RegExp(extractTerm.source, 'g');
 
   const firstMatch = file.search(extr);
@@ -64,4 +64,4 @@ export default (
   }
 
   return parts;
-}
+};

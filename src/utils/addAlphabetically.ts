@@ -1,10 +1,10 @@
-import { fileParts } from '../types';
+import { FileParts } from '../types';
 
 export default (
-  fileParts : fileParts,
-  addition : string,
-  wrapExtracts : string = '\n',
-  separateExtracts : string = '\n',
+  fileParts: FileParts,
+  addition: string,
+  wrapExtracts: string = '\n',
+  separateExtracts: string = '\n',
 ) => {
   let newFile = '';
 
@@ -23,4 +23,4 @@ export default (
   }
 
   return newFile + '\n';
-}
+};

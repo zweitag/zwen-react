@@ -1,24 +1,21 @@
-import Generator from 'yeoman-generator'
 import ejs from 'ejs';
+import Generator from 'yeoman-generator';
 
-import { Zwenerator, GeneratorOptions } from '../types';
-import {
-  addAlphabetically,
-  extractFileParts,
-} from '../utils';
+import { GeneratorOptions, Zwenerator } from '../types';
+import { addAlphabetically, extractFileParts } from '../utils';
 import * as r from './templates/regex';
 import * as t from './templates/templateStrings';
 
 const PATH_PREFIX = 'actions';
 
-class ActionGenerator extends Generator implements Zwenerator {
+export default class ActionGenerator extends Generator implements Zwenerator {
   topLevelPath!: string;
-  destDir!: Array<string>;
+  destDir!: string[];
   fileName!: string;
   path: string;
   withActionType: boolean = true;
 
-  constructor(args: Array<string>, options : GeneratorOptions) {
+  constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
@@ -27,20 +24,20 @@ class ActionGenerator extends Generator implements Zwenerator {
     this.path = this.destDir.slice(0, -1).toString('/');
   }
 
-  prompting() {
-    return this.prompt({
-      type: 'confirm',
+  async prompting() {
+    const answer = await this.prompt({
+      message: 'Create an action type with the same name?',
       name: 'withActionType',
-      message: 'Create an action type with the same name?'
-    }).then(answer => {
-      this.withActionType = answer.withActionType;
+      type: 'confirm',
     });
+
+    this.withActionType = answer.withActionType;
   }
 
   updateExports() {
     let currentPath = `${this.topLevelPath}/`;
 
-    this.destDir.forEach((subPath : string, index : number) => {
+    this.destDir.forEach((subPath: string, index: number) => {
       const lastLevel = index === this.destDir.length - 1;
       const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
       const fileParts = extractFileParts(indexFile, r.exportAll);
@@ -70,7 +67,7 @@ class ActionGenerator extends Generator implements Zwenerator {
       {
         ACTION_NAME: this.fileName,
         ACTION_TYPE: 't.' + (this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE'),
-      }
+      },
     ).removeNewLines();
 
     const fileParts = extractFileParts(creatorsFile, r.exportAction);
@@ -93,7 +90,7 @@ class ActionGenerator extends Generator implements Zwenerator {
       {
         ACTION_NAME: this.fileName,
         ACTION_TYPE: this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE',
-      }
+      },
     ).removeNewLines();
 
     const updatedFile = addAlphabetically(fileParts, newTest, '\n', '\n\n');
@@ -113,5 +110,3 @@ class ActionGenerator extends Generator implements Zwenerator {
     }
   }
 }
-
-export default ActionGenerator;

@@ -2,6 +2,7 @@ import chalk from 'chalk';
 
 import { registeredGenerators } from './generators';
 
+// tslint:disable-next-line no-var-requires
 const { version: pkgVersion } = require('../package.json');
 const { log } = console;
 const { bold, underline, gray } = chalk;
@@ -45,4 +46,4 @@ export default {
     log(`Missing argument: ${bold.red(arg)}`);
     this.showHelpCmd();
   },
-}
+};

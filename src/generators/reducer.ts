@@ -1,18 +1,18 @@
-import Generator from 'yeoman-generator'
+import Generator from 'yeoman-generator';
 
-import { Zwenerator, GeneratorOptions } from '../types';
+import { GeneratorOptions, Zwenerator } from '../types';
 import { addAlphabetically, extractFileParts } from '../utils';
-import * as t from './templates/templateStrings';
 import * as r from './templates/regex';
+import * as t from './templates/templateStrings';
 
 const PATH_PREFIX = 'reducers';
 
-class ReducerGenerator extends Generator implements Zwenerator {
+export default class ReducerGenerator extends Generator implements Zwenerator {
   topLevelPath!: string;
-  destDir!: Array<string>;
+  destDir!: string[];
   fileName!: string;
 
-  constructor(args: Array<string>, options : GeneratorOptions) {
+  constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
@@ -43,14 +43,14 @@ class ReducerGenerator extends Generator implements Zwenerator {
     let currentPath = `${this.topLevelPath}/${this.destDir[0]}/`;
     const exportPaths = this.destDir.slice(1);
 
-    exportPaths.forEach((subPath : string) => {
+    exportPaths.forEach((subPath: string) => {
       if (!this.fs.exists(`${currentPath}/index.js`)) {
         this.fs.copyTpl(
           this.templatePath(`${PATH_PREFIX}/index.ejs`),
           this.destinationPath(`${currentPath}/index.js`),
           {
             REDUCER_NAME: subPath,
-          }
+          },
         );
 
       } else {
@@ -59,7 +59,7 @@ class ReducerGenerator extends Generator implements Zwenerator {
           const importParts = extractFileParts(file, r.importDefault, r.exportDefaultCombine);
           const fileWithImports = addAlphabetically(importParts, t.defaultImport(subPath), '\n\n');
 
-          const combinedParts = extractFileParts(fileWithImports, r.exportCombine, r.combineEnd)
+          const combinedParts = extractFileParts(fileWithImports, r.exportCombine, r.combineEnd);
           const fileWithCombinedReducer = addAlphabetically(combinedParts, t.exportCombine(subPath), '\n');
 
           const exportParts = extractFileParts(fileWithCombinedReducer, r.exportAll);
@@ -79,9 +79,9 @@ class ReducerGenerator extends Generator implements Zwenerator {
       this.templatePath(`${PATH_PREFIX}/file.ejs`),
       this.destinationPath(`${this.topLevelPath}/${this.destDir.join('/')}.js`),
       {
-        STATE_PATH: this.destDir.join('.'),
         SELECTOR_NAME: selectorNameArr.join('-').toCamelCase(),
-      }
+        STATE_PATH: this.destDir.join('.'),
+      },
     );
 
     this.fs.copyTpl(
@@ -90,12 +90,10 @@ class ReducerGenerator extends Generator implements Zwenerator {
       {
         REDUCER_NAME: this.fileName,
         REDUCER_PATH: this.destDir.join('/'),
+        SELECTOR_NAME: selectorNameArr.join('-').toCamelCase(),
         STATE_PARTS: this.destDir,
         STATE_PATH: this.destDir.join('.'),
-        SELECTOR_NAME: selectorNameArr.join('-').toCamelCase(),
-      }
+      },
     );
   }
 }
-
-export default ReducerGenerator;
