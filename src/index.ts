@@ -1,21 +1,13 @@
 import '@babel/polyfill';
 import './prototypes';
 
-import chalk from 'chalk';
 import path from 'path';
 import yeoman from 'yeoman-environment';
 
+import config from './config';
 import { registeredGenerators } from './generators';
 import logger from './logger';
 import { Flags, GeneratorOptions } from './types';
-
-const defaultConfig = {
-  srcDir: 'src',
-};
-// TODO: read user config from .zwen file
-const config = {
-  ...defaultConfig,
-};
 
 module.exports = (args: string[], flags: Flags) => {
   const [command, destPath] = args;
