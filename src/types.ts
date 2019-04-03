@@ -16,7 +16,13 @@ export interface GeneratorOptions {
   classComp?: boolean;
 }
 
+export interface FileToWrite {
+  name: string;
+  content: string;
+}
+
 export interface Zwenerator extends Generator {
+  filesToWrite: FileToWrite[];
   destDir: string[];
   fileName: string;
   topLevelPath: string;

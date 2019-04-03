@@ -2,7 +2,7 @@
     it('should return an action with the correct type and payload', () => {
       const action = actions.<%=ACTION_NAME%>();
 
-      expect(action).toHaveProperty('type', t.<%=ACTION_TYPE%>);
+      expect(action).toHaveProperty('type', <%=ACTION_TYPE%>);
       expect(action).toHaveProperty('payload', {});
     });
   });

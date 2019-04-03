@@ -1,28 +1,34 @@
 import ejs from 'ejs';
 import Generator from 'yeoman-generator';
 
-import { GeneratorOptions, Zwenerator } from '../types';
-import { addAlphabetically, addToFile, extractFileParts } from '../utils';
-import { selectAllExports } from './constants/regex';
-import * as r from './templates/regex';
-import * as t from './templates/templateStrings';
+import { FileToWrite, GeneratorOptions, Zwenerator } from '../types';
+import { addToFile } from '../utils';
+import * as r from './constants/regex';
+import * as t from './constants/templateStrings';
 
 const PATH_PREFIX = 'actions';
+const CREATORS_FILE_NAME = 'creators';
 
 export default class ActionGenerator extends Generator implements Zwenerator {
-  topLevelPath!: string;
-  destDir!: string[];
-  fileName!: string;
+  filesToWrite: FileToWrite[] = [];
+  templateConfig: object = {};
+  destDir: string[];
+  topLevelPath: string;
   path: string;
+  absolutePath: string;
+  fileName: string;
   withActionType: boolean = true;
 
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
+    // TODO: remove this line as soon as file name is no longer added to destDir
+    this.destDir = options.destDir.slice(0, -1);
+    // this.destDir = options.destDir;
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
+    this.path = this.destDir.toString('/');
+    this.absolutePath = `${this.topLevelPath}/${this.path}`;
     this.fileName = options.fileName;
-    this.destDir = options.destDir;
-    this.path = this.destDir.slice(0, -1).toString('/');
   }
 
   async prompting() {
@@ -35,79 +41,83 @@ export default class ActionGenerator extends Generator implements Zwenerator {
     this.withActionType = answer.withActionType;
   }
 
-  updateExports() {
+  configuring() {
+    this.templateConfig = {
+      ACTION_NAME: this.fileName,
+      ACTION_TYPE: 't.' + (this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE'),
+    };
+  }
+
+  addExports() {
+    const destDirWithCreators = this.destDir.concat(CREATORS_FILE_NAME);
     let currentPath = `${this.topLevelPath}/`;
 
-    this.destDir.forEach((subPath: string, index: number) => {
-      const lastLevel = index === this.destDir.length - 1;
-      const newExport = lastLevel ? 'creators' : subPath;
+    destDirWithCreators.forEach((subPath: string, index: number) => {
+      const isLastLevel = index === destDirWithCreators.length - 1;
+      const newCreatorExport = t.exportAllFrom(subPath);
 
+      // read
       const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
-      const fileParts = extractFileParts(indexFile, r.exportAll);
-      const updatedCreatorsFile = addAlphabetically(fileParts, t.exportAll(newExport));
+      // update
+      const updatedIndexFile = addToFile(indexFile, newCreatorExport, r.selectAllExports);
+      // write
+      this.filesToWrite.push({ name: `${currentPath}/index.js`, content: updatedIndexFile });
 
-      this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile);
+      if (this.withActionType && !isLastLevel) {
+        const newTypesExport = t.exportAllFrom(`${subPath}/types`);
 
-      if (this.withActionType && !lastLevel) {
+        // read
         const typesFile = this.fs.read(`${currentPath}/types.js`, { defaults: '' });
-        const typeFileParts = extractFileParts(typesFile, r.exportAll);
-        const updatedTypesFile = addAlphabetically(typeFileParts, t.exportAll(`${subPath}/types`));
-        this.fs.write(`${currentPath}/types.js`, updatedTypesFile);
+        // update
+        const updatedTypesFile = addToFile(typesFile, newTypesExport, r.selectAllExports);
+        // write
+        this.filesToWrite.push({ name: `${currentPath}/types.js`, content: updatedTypesFile });
       }
 
       currentPath += `${subPath}/`;
     });
   }
 
-  createActionFile() {
-    const destPath = `${this.topLevelPath}/${this.path}`;
-    const creatorsFile = this.fs.read(`${destPath}/creators.js`, { defaults: t.importAllTypes() });
+  addActionCreator() {
+    const importStatement = t.importAllAsFrom('t', '@/actions/types') + '\n';
     const creatorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.ejs`));
+    const newCreator = ejs.render(creatorTemplate, this.templateConfig);
 
-    const newCreator = ejs.render(
-      creatorTemplate,
-      {
-        ACTION_NAME: this.fileName,
-        ACTION_TYPE: 't.' + (this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE'),
-      },
-    );
-
-    const updatedFile = addToFile(creatorsFile, newCreator, selectAllExports, '\n\n');
-
-    this.fs.write(`${destPath}/creators.js`, updatedFile);
+    // read
+    const creatorsFile = this.fs.read(`${this.absolutePath}/creators.js`, { defaults: importStatement });
+    // update
+    const updatedFile = addToFile(creatorsFile, newCreator, r.selectAllExports, '\n\n');
+    // write
+    this.filesToWrite.push({ name: `${this.absolutePath}/creators.js`, content: updatedFile });
   }
 
-  createActionTest() {
-    const destPath = `${this.topLevelPath}/${this.path}`;
-    const fileDefaults = t.creatorTestFile(this.path);
-    const defaultContent = fileDefaults.head + '\n' + fileDefaults.foot;
-    const testFile = this.fs.read(`${destPath}/creators.test.js`, { defaults: defaultContent });
-
-    const fileParts = extractFileParts(testFile, r.describeActionTest, r.combineEnd);
-
+  addActionCreatorTest() {
     const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
-    const newTest = ejs.render(
-      testTemplate,
-      {
-        ACTION_NAME: this.fileName,
-        ACTION_TYPE: this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE',
-      },
-    ).removeNewLines();
+    const newTest = ejs.render(testTemplate, this.templateConfig);
 
-    const updatedFile = addAlphabetically(fileParts, newTest, '\n', '\n\n');
-
-    this.fs.write(`${destPath}/creators.test.js`, updatedFile);
+    // read
+    const testFile = this.fs.read(`${this.absolutePath}/creators.test.js`, { defaults: t.creatorTestHead(this.path) });
+    // update
+    const updatedFile = addToFile(testFile, newTest, r.selectAllDescribes, '\n\n  ', t.creatorTestFoot(), '  ');
+    // write
+    this.filesToWrite.push({ name: `${this.absolutePath}/creators.test.js`, content: updatedFile });
   }
 
-  createTypeFiles() {
+  addActionType() {
     if (this.withActionType) {
-      const destPath = `${this.topLevelPath}/${this.path}`;
-      const typesFile = this.fs.read(`${destPath}/types.js`, { defaults: '' });
-      const fileParts = extractFileParts(typesFile, r.exportType, r.doubleNewLine);
-      const newType = t.exportType(this.fileName.toConstantCase(), this.path);
-      const updatedTypesFile = addAlphabetically(fileParts, newType);
+      const actionType = this.fileName.toConstantCase();
+      const newExport = t.exportStringConst(actionType, `${this.path}/${actionType}`);
 
-      this.fs.write(`${destPath}/types.js`, updatedTypesFile);
+      // read
+      const typesFile = this.fs.read(`${this.absolutePath}/types.js`, { defaults: '' });
+      // update
+      const updatedFile = addToFile(typesFile, newExport, r.selectAllExports);
+      // write
+      this.filesToWrite.push({ name: `${this.absolutePath}/types.js`, content: updatedFile });
     }
+  }
+
+  writing() {
+    this.filesToWrite.forEach(({ name, content }) => this.fs.write(name, content));
   }
 }
