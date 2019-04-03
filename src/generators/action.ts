@@ -3,6 +3,7 @@ import Generator from 'yeoman-generator';
 
 import { GeneratorOptions, Zwenerator } from '../types';
 import { addAlphabetically, extractFileParts } from '../utils';
+import { selectAllExports } from './constants/regex';
 import * as r from './templates/regex';
 import * as t from './templates/templateStrings';
 
@@ -68,10 +69,25 @@ export default class ActionGenerator extends Generator implements Zwenerator {
         ACTION_NAME: this.fileName,
         ACTION_TYPE: 't.' + (this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE'),
       },
-    ).removeNewLines();
+    );
 
-    const fileParts = extractFileParts(creatorsFile, r.exportAction);
-    const updatedFile = addAlphabetically(fileParts, newCreator, '\n\n', '\n\n');
+    const existingCreators = creatorsFile.match(selectAllExports) || [];
+    const stringToReplace = existingCreators.join('');
+    const stringToInsert = existingCreators
+      .concat(newCreator)
+      .map((c: string) => c.trim())
+      .sort()
+      .join('\n\n')
+      + '\n';
+
+    let updatedFile: string;
+
+    if (stringToReplace === '') {
+      updatedFile = creatorsFile + '\n\n' + stringToInsert;
+
+    } else {
+      updatedFile = creatorsFile.replace(stringToReplace, stringToInsert);
+    }
 
     this.fs.write(`${destPath}/creators.js`, updatedFile);
   }
