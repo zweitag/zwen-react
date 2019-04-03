@@ -2,7 +2,7 @@ import ejs from 'ejs';
 import Generator from 'yeoman-generator';
 
 import { GeneratorOptions, Zwenerator } from '../types';
-import { addAlphabetically, extractFileParts } from '../utils';
+import { addAlphabetically, addToFile, extractFileParts } from '../utils';
 import { selectAllExports } from './constants/regex';
 import * as r from './templates/regex';
 import * as t from './templates/templateStrings';
@@ -40,9 +40,10 @@ export default class ActionGenerator extends Generator implements Zwenerator {
 
     this.destDir.forEach((subPath: string, index: number) => {
       const lastLevel = index === this.destDir.length - 1;
+      const newExport = lastLevel ? 'creators' : subPath;
+
       const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
       const fileParts = extractFileParts(indexFile, r.exportAll);
-      const newExport = lastLevel ? 'creators' : subPath;
       const updatedCreatorsFile = addAlphabetically(fileParts, t.exportAll(newExport));
 
       this.fs.write(`${currentPath}/index.js`, updatedCreatorsFile);
@@ -71,23 +72,7 @@ export default class ActionGenerator extends Generator implements Zwenerator {
       },
     );
 
-    const existingCreators = creatorsFile.match(selectAllExports) || [];
-    const stringToReplace = existingCreators.join('');
-    const stringToInsert = existingCreators
-      .concat(newCreator)
-      .map((c: string) => c.trim())
-      .sort()
-      .join('\n\n')
-      + '\n';
-
-    let updatedFile: string;
-
-    if (stringToReplace === '') {
-      updatedFile = creatorsFile + '\n\n' + stringToInsert;
-
-    } else {
-      updatedFile = creatorsFile.replace(stringToReplace, stringToInsert);
-    }
+    const updatedFile = addToFile(creatorsFile, newCreator, selectAllExports, '\n\n');
 
     this.fs.write(`${destPath}/creators.js`, updatedFile);
   }
