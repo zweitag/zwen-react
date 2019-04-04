@@ -5,10 +5,12 @@ import { GeneratorOptions, Zwenerator } from '../types';
 const PATH_PREFIX = 'components';
 
 export default class ComponentGenerator extends Generator implements Zwenerator {
-  topLevelPath!: string;
-  destDir!: string[];
-  fileName!: string;
-  path: string;
+  templateConfig: object = {};
+  destDir: string[];
+  destPath: string;
+  topLevelPath: string;
+  absolutePath: string;
+  fileName: string;
   classComp: boolean;
   connected: boolean = false;
   withProps: boolean = true;
@@ -16,10 +18,11 @@ export default class ComponentGenerator extends Generator implements Zwenerator 
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
-    this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
-    this.fileName = options.fileName;
     this.destDir = options.destDir;
-    this.path = this.destDir.slice(0, -1).toString('/');
+    this.destPath = this.destDir.slice(0, -1).toString('/');
+    this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
+    this.absolutePath = `${this.topLevelPath}/${this.destPath}`;
+    this.fileName = options.fileName;
     this.classComp = options.classComp === true;
   }
 
@@ -43,18 +46,22 @@ export default class ComponentGenerator extends Generator implements Zwenerator 
     }
   }
 
+  configuring() {
+    this.templateConfig = {
+      COMPONENT_NAME: this.fileName.toPascalCase(),
+      CONNECTED: this.connected,
+      WITH_PROPS: this.withProps,
+    };
+  }
+
   writing() {
-    const destPath = `${this.topLevelPath}/${this.path}`;
-    const componentName = this.fileName.toPascalCase();
+    const destPath = `${this.absolutePath}`;
     const templateName = this.classComp ? 'classComp' : 'component';
+    const componentName = this.fileName.toPascalCase();
     this.fs.copyTpl(
       this.templatePath(`${PATH_PREFIX}/${templateName}.ejs`),
       this.destinationPath(`${destPath}/${componentName}.js`),
-      {
-        COMPONENT_NAME: componentName,
-        CONNECTED: this.connected,
-        WITH_PROPS: this.withProps,
-      },
+      this.templateConfig,
     );
   }
 }

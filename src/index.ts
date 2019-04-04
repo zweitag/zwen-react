@@ -29,7 +29,7 @@ module.exports = (args: string[], flags: Flags) => {
       return;
     }
 
-    const {name: fileName, dir } = path.parse(destPath);
+    const { name: fileName, dir } = path.parse(destPath);
 
     // TODO: remove fileName from destDir
     const options: GeneratorOptions = {

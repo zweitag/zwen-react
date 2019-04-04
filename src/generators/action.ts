@@ -13,8 +13,8 @@ export default class ActionGenerator extends Generator implements Zwenerator {
   filesToWrite: FileToWrite[] = [];
   templateConfig: object = {};
   destDir: string[];
+  destPath: string;
   topLevelPath: string;
-  path: string;
   absolutePath: string;
   fileName: string;
   withActionType: boolean = true;
@@ -25,9 +25,9 @@ export default class ActionGenerator extends Generator implements Zwenerator {
     // TODO: remove this line as soon as file name is no longer added to destDir
     this.destDir = options.destDir.slice(0, -1);
     // this.destDir = options.destDir;
+    this.destPath = this.destDir.toString('/');
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
-    this.path = this.destDir.toString('/');
-    this.absolutePath = `${this.topLevelPath}/${this.path}`;
+    this.absolutePath = `${this.topLevelPath}/${this.destPath}`;
     this.fileName = options.fileName;
   }
 
@@ -94,9 +94,10 @@ export default class ActionGenerator extends Generator implements Zwenerator {
   addActionCreatorTest() {
     const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
     const newTest = ejs.render(testTemplate, this.templateConfig);
+    const fileDefaults = t.creatorTestHead(this.destPath);
 
     // read
-    const testFile = this.fs.read(`${this.absolutePath}/creators.test.js`, { defaults: t.creatorTestHead(this.path) });
+    const testFile = this.fs.read(`${this.absolutePath}/creators.test.js`, { defaults: fileDefaults });
     // update
     const updatedFile = addToFile(testFile, newTest, r.selectAllDescribes, '\n\n  ', t.creatorTestFoot(), '  ');
     // write
@@ -106,7 +107,7 @@ export default class ActionGenerator extends Generator implements Zwenerator {
   addActionType() {
     if (this.withActionType) {
       const actionType = this.fileName.toConstantCase();
-      const newExport = t.exportStringConst(actionType, `${this.path}/${actionType}`);
+      const newExport = t.exportStringConst(actionType, `${this.destPath}/${actionType}`);
 
       // read
       const typesFile = this.fs.read(`${this.absolutePath}/types.js`, { defaults: '' });

@@ -22,10 +22,12 @@ export interface FileToWrite {
 }
 
 export interface Zwenerator extends Generator {
-  filesToWrite: FileToWrite[];
-  destDir: string[];
+  filesToWrite?: FileToWrite[];
+  destDir: string[];          // path elements leading from enclosing dir to the file
+  destPath: string;           // path leading from enclosing dir to target directory
+  topLevelPath: string;       // path leading to the enclosing directory
+  absolutePath: string;       // path combination of topLevelPath and destPath
   fileName: string;
-  topLevelPath: string;
 }
 
 export interface FileParts {
