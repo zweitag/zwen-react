@@ -1,99 +1,102 @@
 import Generator from 'yeoman-generator';
 
-import { GeneratorOptions, Zwenerator } from '../types';
-import { addAlphabetically, extractFileParts } from '../utils';
-import * as r from './templates/regex';
-import * as t from './templates/templateStrings';
+import { FileToWrite, GeneratorOptions, Zwenerator } from '../types';
+import { addToFile } from '../utils';
+import * as r from './constants/regex';
+import * as t from './constants/templateStrings';
 
 const PATH_PREFIX = 'reducers';
 
 export default class ReducerGenerator extends Generator implements Zwenerator {
-  topLevelPath!: string;
-  destDir!: string[];
-  fileName!: string;
+  filesToWrite: FileToWrite[] = [];
+  templateConfig: object = {};
+  destDir: string[];
+  destPath: string;
+  topLevelPath: string;
+  absolutePath: string;
+  fileName: string;
 
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
-    this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
-    this.fileName = options.fileName;
     this.destDir = options.destDir;
+    this.destPath = this.destDir.join('/');
+    this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
+    this.absolutePath = `${this.topLevelPath}/${this.destPath}`;
+    this.fileName = options.fileName;
   }
 
-  checkdestDir() {
-    if (this.destDir.length < 2) {
-      this.log('We do not support top-level reducers. Please specify at least one sub folder!');
+  initializing() {
+    if (this.destDir.length === 0) {
+      this.log('We do not support top-level reducers. Please specify at least one subdirectory.');
       process.exit(0);
     }
   }
 
-  updateTopLevel() {
-    const indexFile = this.fs.read(`${this.topLevelPath}/index.js`, { defaults: '' });
-    const indexFileParts = extractFileParts(indexFile, r.exportDefaultAs);
-    const updatedIndexFile = addAlphabetically(indexFileParts, t.exportDefaultAs(this.destDir[0]));
-    this.fs.write(`${this.topLevelPath}/index.js`, updatedIndexFile);
-
-    const selectorFile = this.fs.read(`${this.topLevelPath}/selectors.js`, { defaults: '' });
-    const selectorFileParts = extractFileParts(selectorFile, r.exportAll);
-    const updatedSelectorFile = addAlphabetically(selectorFileParts, t.exportAll(this.destDir[0]));
-    this.fs.write(`${this.topLevelPath}/selectors.js`, updatedSelectorFile);
+  configuring() {
+    this.templateConfig = {
+      REDUCER_NAME: this.fileName,
+      REDUCER_PATH: this.destDir.join('/'),
+      SELECTOR_NAME: ['get', ...this.destDir].join('-').toCamelCase(),
+      STATE_PARTS: this.destDir,
+      STATE_PATH: this.destDir.join('.'),
+    };
   }
 
-  updateExports() {
-    let currentPath = `${this.topLevelPath}/${this.destDir[0]}/`;
-    const exportPaths = this.destDir.slice(1);
+  addExports() {
+    const destDirWithFileName = this.destDir.concat(this.fileName);
+    let currentPath = `${this.topLevelPath}`;
 
-    exportPaths.forEach((subPath: string) => {
-      if (!this.fs.exists(`${currentPath}/index.js`)) {
-        this.fs.copyTpl(
-          this.templatePath(`${PATH_PREFIX}/index.ejs`),
-          this.destinationPath(`${currentPath}/index.js`),
-          {
-            REDUCER_NAME: subPath,
-          },
-        );
+    destDirWithFileName.forEach((subPath: string) => {
+      // read
+      const importWithNewLine = t.importNamedFrom('combineReducers', 'redux') + '\n';
+      const file = this.fs.read(`${currentPath}/index.js`, { defaults: importWithNewLine });
+      // update imports
+      let updatedFile = addToFile(file, t.importDefaultFrom(subPath, `./${subPath}`), r.selectDefaultImports);
 
-      } else {
-        const file = this.fs.read(`${currentPath}/index.js`);
-        if (!file.includes(t.defaultImport(subPath))) {
-          const importParts = extractFileParts(file, r.importDefault, r.exportDefaultCombine);
-          const fileWithImports = addAlphabetically(importParts, t.defaultImport(subPath), '\n\n');
-
-          const combinedParts = extractFileParts(fileWithImports, r.exportCombine, r.combineEnd);
-          const fileWithCombinedReducer = addAlphabetically(combinedParts, t.exportCombine(subPath), '\n');
-
-          const exportParts = extractFileParts(fileWithCombinedReducer, r.exportAll);
-          const updatedFile = addAlphabetically(exportParts, t.exportAll(subPath), '\n\n');
-
-          this.fs.write(`${currentPath}/index.js`, updatedFile);
-        }
+      // insert default export
+      if (!r.selectCombineReducersMethod.test(file)) {
+        const combineOptions = {
+          prefixForAll: '\n',
+        };
+        updatedFile = addToFile(updatedFile, t.exportDefaultCombineReducers(), undefined, combineOptions);
       }
-      currentPath += `${subPath}/`;
+
+      // update combined reducers
+      const updateOptions = {
+        appendixIfNew: '});\n\n',
+        prefixForAll: '  ',
+        separator: '',
+        suffixForAll: '\n',
+      };
+      updatedFile = addToFile(updatedFile, `${subPath},`, r.selectCombinedReducers, updateOptions);
+
+      // update selector exports
+      updatedFile = addToFile(updatedFile, t.exportAllFrom(subPath), r.selectExportsAll);
+
+      this.filesToWrite.push({ name: `${currentPath}/index.js`, content: updatedFile });
+
+      currentPath += `/${subPath}`;
     });
   }
 
-  copyFileTemplates() {
-    const selectorNameArr = ['get', ...this.destDir];
-
+  addReducer() {
     this.fs.copyTpl(
       this.templatePath(`${PATH_PREFIX}/file.ejs`),
-      this.destinationPath(`${this.topLevelPath}/${this.destDir.join('/')}.js`),
-      {
-        SELECTOR_NAME: selectorNameArr.join('-').toCamelCase(),
-        STATE_PATH: this.destDir.join('.'),
-      },
+      this.destinationPath(`${this.absolutePath}/${this.fileName}.js`),
+      this.templateConfig,
     );
+  }
 
+  addReducerTest() {
     this.fs.copyTpl(
       this.templatePath(`${PATH_PREFIX}/test.ejs`),
-      this.destinationPath(`${this.topLevelPath}/${this.destDir.join('/')}.test.js`),
-      {
-        REDUCER_NAME: this.fileName,
-        REDUCER_PATH: this.destDir.join('/'),
-        SELECTOR_NAME: selectorNameArr.join('-').toCamelCase(),
-        STATE_PARTS: this.destDir,
-        STATE_PATH: this.destDir.join('.'),
-      },
+      this.destinationPath(`${this.absolutePath}/${this.fileName}.test.js`),
+      this.templateConfig,
     );
+  }
+
+  writing() {
+    this.filesToWrite.forEach(({ name, content }) => this.fs.write(name, `${content.trim()}\n`));
   }
 }

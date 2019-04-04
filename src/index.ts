@@ -31,11 +31,10 @@ module.exports = (args: string[], flags: Flags) => {
 
     const { name: fileName, dir } = path.parse(destPath);
 
-    // TODO: remove fileName from destDir
     const options: GeneratorOptions = {
       ...config,
       classComp: flags.classComp != null || flags.c,
-      destDir: dir.split('/').filterEmptyStrings().concat(fileName),
+      destDir: dir.split('/').filterEmptyStrings(),
       fileName,
     };
 

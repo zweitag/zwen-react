@@ -5,7 +5,7 @@ describe('utils/addToFile', () => {
   let addition: string;
   let selector: RegExp;
 
-  beforeAll(() => {
+  beforeEach(() => {
     selector = /export(.+?(?=export|$))/gs;
   });
 
@@ -18,26 +18,29 @@ describe('utils/addToFile', () => {
     it('should insert the addition at the end of the file', () => {
       const result = addToFile(file, addition, selector);
 
-      expect(result).toBe('import test from test\nexport something\n');
+      expect(result).toBe('import test from test\nexport something');
     });
 
     it('should allow the addition of an appendix', () => {
-      const result = addToFile(file, addition, selector, '\n', '\n--end');
+      const options = {
+        appendixIfNew: '\n--end',
+      };
+      const result = addToFile(file, addition, selector, options);
 
-      expect(result).toBe('import test from test\nexport something\n--end\n');
+      expect(result).toBe('import test from test\nexport something\n--end');
     });
   });
 
   describe('existing selections', () => {
     beforeEach(() => {
-      file = 'import test from test\n\nexport a\nexport b\n';
+      file = 'import test from test\n\nexport a\nexport b';
       addition = 'export c';
     });
 
     it('should insert the addition', () => {
       const result = addToFile(file, addition, selector);
 
-      expect(result).toBe('import test from test\n\nexport a\nexport b\nexport c\n');
+      expect(result).toBe('import test from test\n\nexport a\nexport b\nexport c');
     });
 
     it('should sort the addition alphabetically', () => {
@@ -45,15 +48,17 @@ describe('utils/addToFile', () => {
 
       const result = addToFile(file, addition, selector);
 
-      expect(result).toBe('import test from test\n\nexport a\nexport abc\nexport b\n');
+      expect(result).toBe('import test from test\n\nexport a\nexport abc\nexport b');
     });
 
     it('should use a given separator', () => {
-      const separator = '\n\n';
+      const options = {
+        separator: '\n\n',
+      };
 
-      const result = addToFile(file, addition, selector, separator);
+      const result = addToFile(file, addition, selector, options);
 
-      expect(result).toBe('import test from test\n\nexport a\n\nexport b\n\nexport c\n');
+      expect(result).toBe('import test from test\n\nexport a\n\nexport b\n\nexport c');
     });
 
     it('should do nothing if the addition already exists', () => {
@@ -61,18 +66,49 @@ describe('utils/addToFile', () => {
 
       const result = addToFile(file, addition, selector);
 
-      expect(result).toBe('import test from test\n\nexport a\nexport b\n');
+      expect(result).toBe('import test from test\n\nexport a\nexport b');
     });
 
     it('should allow the use of an additional separator for positive lookaheads', () => {
-      const replaceStringSeparator = '  ';
       file = 'import test from test\n\n  export a\n  export b\n';
       addition = '  export c';
       selector = /(?<=\n {2})export(.+?(?= {2}export|$))/gs;
 
-      const result = addToFile(file, addition, selector, '\n  ', undefined, replaceStringSeparator);
+      const options = {
+        replaceStringSeparator: '  ',
+        separator: '\n  ',
+      };
 
-      expect(result).toBe('import test from test\n\n  export a\n  export b\n  export c\n');
+      const result = addToFile(file, addition, selector, options);
+
+      expect(result).toBe('import test from test\n\n  export a\n  export b\n  export c');
+    });
+
+    it('should add a given string if no selector is supplied', () => {
+      addition = '\nend-of-file';
+      const result = addToFile(file, addition);
+
+      expect(result).toBe('import test from test\n\nexport a\nexport b\nend-of-file');
+    });
+
+    it('should add a prefix to all matches if one is provided', () => {
+      const options = {
+        prefixForAll: '--',
+      };
+
+      const result = addToFile(file, addition, selector, options);
+
+      expect(result).toBe('import test from test\n\n--export a\n--export b\n--export c');
+    });
+
+    it('should add a prefix to all matches if one is provided', () => {
+      const options = {
+        suffixForAll: '--',
+      };
+
+      const result = addToFile(file, addition, selector, options);
+
+      expect(result).toBe('import test from test\n\nexport a--\nexport b--\nexport c--');
     });
   });
 });

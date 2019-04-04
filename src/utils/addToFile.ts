@@ -10,31 +10,45 @@
     needs a separator of \nXX
     and a replaceStringSeparator of XX
 */
+import { AdditionOptions } from '../types';
+
+const defaultOptions: AdditionOptions = {
+  appendixIfNew: '',
+  prefixForAll: '',
+  replaceStringSeparator: '',
+  separator: '\n',
+  suffixForAll: '',
+};
 
 export default (
   file: string,
   addition: string,
-  selector: RegExp,
-  separator: string = '\n',
-  appendixIfNew: string = '',
-  replaceStringSeparator: string = '',
+  selector: RegExp = /a^/,       // default: match nothing
+  options: AdditionOptions = {},
 ) => {
+  const opts = {
+    ...defaultOptions,
+    ...options,
+  };
+
   if (file.includes(addition.trim())) {
     return file;
   }
 
   const selection = file.match(selector) || [];
-  const stringToReplace = selection.join(replaceStringSeparator);
+  const stringToReplace = selection.join(opts.replaceStringSeparator);
 
   if (stringToReplace === '') {
-    return (file + addition + appendixIfNew).trim() + '\n';
+    const additionWithAffixes = opts.prefixForAll + addition + opts.suffixForAll;
+
+    return file + additionWithAffixes + opts.appendixIfNew;
   }
 
   const stringToInsert = selection
     .concat(addition)
-    .map((c: string) => c.trim())
+    .map((c: string) => `${opts.prefixForAll}${c.trim()}${opts.suffixForAll}`)
     .sort()
-    .join(separator);
+    .join(opts.separator);
 
-  return (file.replace(stringToReplace, stringToInsert)).trim() + '\n';
+  return file.replace(stringToReplace, stringToInsert);
 };

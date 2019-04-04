@@ -19,7 +19,7 @@ export default class ComponentGenerator extends Generator implements Zwenerator 
     super(args, options);
 
     this.destDir = options.destDir;
-    this.destPath = this.destDir.slice(0, -1).toString('/');
+    this.destPath = this.destDir.join('/');
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
     this.absolutePath = `${this.topLevelPath}/${this.destPath}`;
     this.fileName = options.fileName;
@@ -60,7 +60,7 @@ export default class ComponentGenerator extends Generator implements Zwenerator 
     const componentName = this.fileName.toPascalCase();
     this.fs.copyTpl(
       this.templatePath(`${PATH_PREFIX}/${templateName}.ejs`),
-      this.destinationPath(`${destPath}/${componentName}.js`),
+      this.destinationPath(`${this.absolutePath}/${componentName}.js`),
       this.templateConfig,
     );
   }

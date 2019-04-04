@@ -22,10 +22,8 @@ export default class ActionGenerator extends Generator implements Zwenerator {
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
-    // TODO: remove this line as soon as file name is no longer added to destDir
-    this.destDir = options.destDir.slice(0, -1);
-    // this.destDir = options.destDir;
-    this.destPath = this.destDir.toString('/');
+    this.destDir = options.destDir;
+    this.destPath = this.destDir.join('/');
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
     this.absolutePath = `${this.topLevelPath}/${this.destPath}`;
     this.fileName = options.fileName;
@@ -50,7 +48,7 @@ export default class ActionGenerator extends Generator implements Zwenerator {
 
   addExports() {
     const destDirWithCreators = this.destDir.concat(CREATORS_FILE_NAME);
-    let currentPath = `${this.topLevelPath}/`;
+    let currentPath = `${this.topLevelPath}`;
 
     destDirWithCreators.forEach((subPath: string, index: number) => {
       const isLastLevel = index === destDirWithCreators.length - 1;
@@ -59,7 +57,7 @@ export default class ActionGenerator extends Generator implements Zwenerator {
       // read
       const indexFile = this.fs.read(`${currentPath}/index.js`, { defaults: '' });
       // update
-      const updatedIndexFile = addToFile(indexFile, newCreatorExport, r.selectAllExports);
+      const updatedIndexFile = addToFile(indexFile, newCreatorExport, r.selectExports);
       // write
       this.filesToWrite.push({ name: `${currentPath}/index.js`, content: updatedIndexFile });
 
@@ -69,12 +67,12 @@ export default class ActionGenerator extends Generator implements Zwenerator {
         // read
         const typesFile = this.fs.read(`${currentPath}/types.js`, { defaults: '' });
         // update
-        const updatedTypesFile = addToFile(typesFile, newTypesExport, r.selectAllExports);
+        const updatedTypesFile = addToFile(typesFile, newTypesExport, r.selectExports);
         // write
         this.filesToWrite.push({ name: `${currentPath}/types.js`, content: updatedTypesFile });
       }
 
-      currentPath += `${subPath}/`;
+      currentPath += `/${subPath}`;
     });
   }
 
@@ -86,7 +84,10 @@ export default class ActionGenerator extends Generator implements Zwenerator {
     // read
     const creatorsFile = this.fs.read(`${this.absolutePath}/creators.js`, { defaults: importStatement });
     // update
-    const updatedFile = addToFile(creatorsFile, newCreator, r.selectAllExports, '\n\n');
+    const updateOptions = {
+      separator: '\n\n',
+    };
+    const updatedFile = addToFile(creatorsFile, newCreator, r.selectExports, updateOptions);
     // write
     this.filesToWrite.push({ name: `${this.absolutePath}/creators.js`, content: updatedFile });
   }
@@ -99,7 +100,12 @@ export default class ActionGenerator extends Generator implements Zwenerator {
     // read
     const testFile = this.fs.read(`${this.absolutePath}/creators.test.js`, { defaults: fileDefaults });
     // update
-    const updatedFile = addToFile(testFile, newTest, r.selectAllDescribes, '\n\n  ', t.creatorTestFoot(), '  ');
+    const updateOptions = {
+      appendixIfNew: t.creatorTestFoot(),
+      replaceStringSeparator: '  ',
+      separator: '\n\n  ',
+    };
+    const updatedFile = addToFile(testFile, newTest, r.selectDescribes, updateOptions);
     // write
     this.filesToWrite.push({ name: `${this.absolutePath}/creators.test.js`, content: updatedFile });
   }
@@ -112,13 +118,13 @@ export default class ActionGenerator extends Generator implements Zwenerator {
       // read
       const typesFile = this.fs.read(`${this.absolutePath}/types.js`, { defaults: '' });
       // update
-      const updatedFile = addToFile(typesFile, newExport, r.selectAllExports);
+      const updatedFile = addToFile(typesFile, newExport, r.selectExports);
       // write
       this.filesToWrite.push({ name: `${this.absolutePath}/types.js`, content: updatedFile });
     }
   }
 
   writing() {
-    this.filesToWrite.forEach(({ name, content }) => this.fs.write(name, content));
+    this.filesToWrite.forEach(({ name, content }) => this.fs.write(name, `${content.trim()}\n`));
   }
 }
