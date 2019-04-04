@@ -20,7 +20,7 @@ export default (state = initialState, action = {}) => {
 };
 ```
 
-All reducers get exported in their respective folder's *index.js* file by
+All reducers and their selectors get exported in the respective folder's *index.js* file by
 using `combineReducers` ([Redux Docs](https://redux.js.org/api-reference/combinereducers)):
 
 ```
@@ -33,6 +33,8 @@ import myReducer from './myReducer';
 export default combineReducers({
   myReducer,
 });
+
+export * from './myReducer';
 ```
 
 All reducer folders get accessed by the top level *index.js* file
