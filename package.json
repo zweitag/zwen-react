@@ -1,7 +1,7 @@
 {
   "name": "zwen-react",
   "description": "Code generator CLI for projects using react and redux",
-  "version": "0.7.5",
+  "version": "0.8.0",
   "author": "Zweitag GmbH @zweitag",
   "contributors": [
     "Alex Kott <alexander.kott@zweitag.de>",
@@ -59,7 +59,8 @@
     "dev": "export NODE_ENV='development' && ./bin/run",
     "build": "export NODE_ENV=production && npm run clear && npm run babel",
     "lint": " tslint src/**/*.ts --format stylish",
-    "test": "jest src && npm run lint",
-    "prepare": "npm test && npm run build"
+    "test": "jest src --watch",
+    "test:ci": "jest src",
+    "prepare": "npm run test:ci && npm run lint && npm run build"
   }
 }
