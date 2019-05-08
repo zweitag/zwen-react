@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const defaultConfig = {
+  indent: '  ',
   srcDir: 'src',
 };
 

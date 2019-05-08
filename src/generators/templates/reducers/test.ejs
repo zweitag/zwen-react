@@ -3,37 +3,37 @@ import * as t from '@/actions/types';
 import reducer, * as selectors from './<%=REDUCER_NAME%>';
 
 describe('reducers/<%=REDUCER_PATH%>', () => {
-  it('should return the state if no action matches', () => {
-    const mockAction = {
-      type: 'test/TEST_ACTION',
-    };
-    const mockState = {
-      test: true,
-    };
+<%=indent()%>it('should return the state if no action matches', () => {
+<%=indent(2)%>const mockAction = {
+<%=indent(3)%>type: 'test/TEST_ACTION',
+<%=indent(2)%>};
+<%=indent(2)%>const mockState = {
+<%=indent(3)%>test: true,
+<%=indent(2)%>};
 
-    const state = reducer(mockState, mockAction);
-    expect(state).toHaveProperty('test', true);
-  });
+<%=indent(2)%>const state = reducer(mockState, mockAction);
+<%=indent(2)%>expect(state).toHaveProperty('test', true);
+<%=indent()%>});
 });
 
 describe('reducers/<%=REDUCER_PATH%>/selectors', () => {
-  describe('<%=SELECTOR_NAME%>', () => {
-    it('should return the correct value from state', () => {
-      const mockState = {
-      <%_ let spaces = ''; _%>
-      <%_ STATE_PARTS.forEach(part => {_%>
-        <%=spaces%><%=part%>: {
-        <%_ spaces+= '  '; _%>
-      <%_ }); _%>
-        <%=spaces%>value: 'test',
-      <%_ STATE_PARTS.forEach(part => {_%>
-        <%_ spaces = spaces.slice(0, -2); _%>
-        <%=spaces%>},
-      <%_ }); _%>
-      };
+<%=indent()%>describe('<%=SELECTOR_NAME%>', () => {
+<%=indent(2)%>it('should return the correct value from state', () => {
+<%=indent(3)%>const mockState = {
+  <%_ let currentIndent = 4; _%>
+  <%_ STATE_PARTS.forEach(part => { _%>
+<%=indent(currentIndent)%><%=part%>: {
+  <%_ currentIndent += 1; _%>
+  <%_ }); _%>
+<%=indent(currentIndent)%>value: 'test',
+  <%_ STATE_PARTS.forEach(part => { _%>
+  <%_ currentIndent -= 1; _%>
+<%=indent(currentIndent)%>},
+  <%_ }); _%>
+<%=indent(3)%>};
 
-      const result = selectors.<%=SELECTOR_NAME%>(mockState);
-      expect(result).toHaveProperty('value', 'test');
-    });
-  });
+<%=indent(3)%>const result = selectors.<%=SELECTOR_NAME%>(mockState);
+<%=indent(3)%>expect(result).toHaveProperty('value', 'test');
+<%=indent(2)%>});
+<%=indent()%>});
 });
