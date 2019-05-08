@@ -22,12 +22,23 @@ yarn global add zwen-react
 ```
 
 ## Configuration
-You can create a `.zwen` file in your project directory. Currently you only have a single option there.
+You can create a `.zwen` file in your project directory.
 
+### Source Directory
+Especially for repositories holding both backend and frontend it might be necessary to change the default source directory.
 ```
 // => .zwen
 {
   "srcDir": "frontend/src" // default: "src"
+}
+```
+
+### Indentation
+If you prefer tabs or any other kind of indentation you may define it here.
+```
+// => .zwen
+{
+  "indent": "    " // default: "  " (two spaces)
 }
 ```
 

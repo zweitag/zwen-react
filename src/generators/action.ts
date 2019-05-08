@@ -12,6 +12,7 @@ const CREATORS_FILE_NAME = 'creators';
 export default class ActionGenerator extends Generator implements Zwenerator {
   filesToWrite: FileToWrite[] = [];
   templateConfig: object = {};
+  indent: string;
   destDir: string[];
   destPath: string;
   topLevelPath: string;
@@ -22,6 +23,7 @@ export default class ActionGenerator extends Generator implements Zwenerator {
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
+    this.indent = options.indent;
     this.destDir = options.destDir;
     this.destPath = this.destDir.join('/');
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
@@ -43,6 +45,7 @@ export default class ActionGenerator extends Generator implements Zwenerator {
     this.templateConfig = {
       ACTION_NAME: this.fileName,
       ACTION_TYPE: 't.' + (this.withActionType ? this.fileName.toConstantCase() : 'ACTION_TYPE'),
+      indent: (amount = 1) => this.indent.repeat(amount),
     };
   }
 

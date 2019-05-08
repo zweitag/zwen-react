@@ -16,17 +16,17 @@ const mapDispatchToProps = dispatch => ({
 <%_ } _%>
 
 class <%=COMPONENT_NAME%> extends React.Component {
-  constructor(props) {
-    super(props);
-  }
+<%=indent()%>constructor(props) {
+<%=indent(2)%>super(props);
+<%=indent()%>}
 
-  render() {
-    const {} = this.props;
+<%=indent()%>render() {
+<%=indent(2)%>const {} = this.props;
 
-    return (
+<%=indent(2)%>return (
 
-    )
-  }
+<%=indent(2)%>)
+<%=indent()%>}
 }
 
 <%=COMPONENT_NAME%>.propTypes = {

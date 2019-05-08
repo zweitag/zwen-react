@@ -34,6 +34,7 @@ export interface GeneratorOptions {
   fileName: string;
   srcDir: string;
   classComp?: boolean;
+  indent: string;
 }
 
 export interface Zwenerator extends Generator {

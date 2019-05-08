@@ -10,6 +10,7 @@ const PATH_PREFIX = 'reducers';
 export default class ReducerGenerator extends Generator implements Zwenerator {
   filesToWrite: FileToWrite[] = [];
   templateConfig: object = {};
+  indent: string;
   destDir: string[];
   destPath: string;
   topLevelPath: string;
@@ -19,6 +20,7 @@ export default class ReducerGenerator extends Generator implements Zwenerator {
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
+    this.indent = options.indent;
     this.destDir = options.destDir;
     this.destPath = this.destDir.join('/');
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
@@ -40,6 +42,7 @@ export default class ReducerGenerator extends Generator implements Zwenerator {
       SELECTOR_NAME: ['get', ...this.destDir].join('-').toCamelCase(),
       STATE_PARTS: this.destDir,
       STATE_PATH: this.destDir.join('.'),
+      indent: (amount = 1) => this.indent.repeat(amount),
     };
   }
 
@@ -65,7 +68,7 @@ export default class ReducerGenerator extends Generator implements Zwenerator {
       // update combined reducers
       const updateOptions = {
         appendixIfNew: '});\n\n',
-        prefixForAll: '  ',
+        prefixForAll: this.indent,
         separator: '',
         suffixForAll: '\n',
       };

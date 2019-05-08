@@ -3,13 +3,13 @@ import * as t from '@/actions/types';
 const initialState = '';
 
 export default (state = initialState, action = {}) => {
-  const { type, payload } = action;
+<%=indent()%>const { type, payload } = action;
 
-  if (type === t.MY_ACTION) {
-    return 'newState';
-  }
+<%=indent()%>if (type === t.MY_ACTION) {
+<%=indent(2)%>return 'newState';
+<%=indent()%>}
 
-  return state;
+<%=indent()%>return state;
 };
 
 export const <%=SELECTOR_NAME%> = state => state.<%=STATE_PATH%>;
