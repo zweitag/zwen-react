@@ -1,8 +1,8 @@
-  describe('<%=ACTION_NAME%>', () => {
-    it('should return an action with the correct type and payload', () => {
-      const action = actions.<%=ACTION_NAME%>();
+<%=indent()%>describe('<%=ACTION_NAME%>', () => {
+<%=indent(2)%>it('should return an action with the correct type and payload', () => {
+<%=indent(3)%>const action = actions.<%=ACTION_NAME%>();
 
-      expect(action).toHaveProperty('type', <%=ACTION_TYPE%>);
-      expect(action).toHaveProperty('payload', {});
-    });
-  });
+<%=indent(3)%>expect(action).toHaveProperty('type', <%=ACTION_TYPE%>);
+<%=indent(3)%>expect(action).toHaveProperty('payload', {});
+<%=indent(2)%>});
+<%=indent()%>});
