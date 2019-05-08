@@ -6,6 +6,7 @@ const PATH_PREFIX = 'components';
 
 export default class ComponentGenerator extends Generator implements Zwenerator {
   templateConfig: object = {};
+  indent: string;
   destDir: string[];
   destPath: string;
   topLevelPath: string;
@@ -18,6 +19,7 @@ export default class ComponentGenerator extends Generator implements Zwenerator 
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
 
+    this.indent = options.indent;
     this.destDir = options.destDir;
     this.destPath = this.destDir.join('/');
     this.topLevelPath = `${options.srcDir}/${PATH_PREFIX}`;
@@ -51,6 +53,7 @@ export default class ComponentGenerator extends Generator implements Zwenerator 
       COMPONENT_NAME: this.fileName.toPascalCase(),
       CONNECTED: this.connected,
       WITH_PROPS: this.withProps,
+      indent: (amount = 1) => this.indent.repeat(amount),
     };
   }
 
