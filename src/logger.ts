@@ -46,4 +46,11 @@ export default {
     log(`Missing argument: ${bold.red(arg)}`);
     this.showHelpCmd();
   },
+  invalidConfig(option: string, comment?: string) {
+    log(`Your ${gray.underline('.zwen file')} contains an invalid configuration: ${bold.red(option)}.`);
+
+    if (comment != null) {
+      log(comment);
+    }
+  },
 };
