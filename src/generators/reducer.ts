@@ -68,7 +68,7 @@ export default class ReducerGenerator extends Generator implements Zwenerator {
       // update combined reducers
       const updateOptions = {
         appendixIfNew: '});\n\n',
-        prefixForAll: '  ',
+        prefixForAll: this.indent,
         separator: '',
         suffixForAll: '\n',
       };
