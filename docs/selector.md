@@ -31,9 +31,7 @@ export const getPostAuthor = createSelector(
     getUsers,
     getSelectedPost,
   ],
-  (users, post) => ({
-    author: users.find(user => post.author.id === user.id),
-  })
+  (users, post) => users.find(user => post.author.id === user.id)
 );
 ```
 Since these types of selectors can't be matched with a single reducer, they should go in their own folder and file.

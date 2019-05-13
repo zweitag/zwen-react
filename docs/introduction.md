@@ -1,4 +1,5 @@
-# Introduction – Journey of the State
+# Introduction
+## Journey of the State
 The most important architectural aspect of modern web applications is state. State is everywhere: Is the menu open? Is the user logged in? Is the app processing an Ajax request? Is the mouse hovering over an item? Questions like that need to be answered in almost every web app nowadays.
 
 In most React tutorials you find state being organized inside components. You'd use `setState()` a lot and have your state relatively close to where it's needed. But as soon as the app grows a bit larger – and most apps do – you'll realize that the state is spreaded all over the place and it's getting harder to keep everything clean.
@@ -64,3 +65,81 @@ const mapStateToProps = state => ({
 {isOpen && <Menu />}
 ```
 So the user's click in one component triggered a chain reaction that lead to firing an action through all reducers, changing the state and receiving the updated state at another component. React will notice that the component's properties have changed and will update the UI accordingly.
+
+## Organizing State
+In smaller apps it is easy to just create top level reducer and keep a flat organization of your state. That might look like this:
+```
+|--reducers
+|----menu.js
+|----sidebar.js
+|----cookies.js
+```
+
+However, in our point of view it doesn't make much sense to use Redux in these apps anyway. Why would you create such a big overhead if it much simpler to use the component state provided by React?
+
+A good starting point when thinking about state organization is the division into five different types of frontend state:
+
+```
+|--reducers
+|----control / ui
+|------[...reducers]
+|------index.js
+|----data
+|------[...reducers]
+|------index.js
+|----communication
+|------[...reducers]
+|------index.js
+|----session
+|------[...reducers]
+|------index.js
+|----location / router
+|------[...reducers]
+|------index.js
+```
+
+### Control / UI
+Everything the user has direct control over, for example by toggling a checkbox or clicking a button. Most of the time the effects of changing the control state are displayed directly in the user interface.
+
+Examples:
+```
+isMenuOpen: true
+filter:     'my phrase'
+uiTheme:    'dark'
+```
+
+### Data
+The things an API might deliver for your app to display. Or the state a user creates to store in some kind of database.
+
+Examples:
+```
+blogPosts:  [{ id: 1, content: 'My Post' }, ...]
+users:      [{ name: 'Uta' }]
+```
+
+### Communication
+If you want to display a loading screen or an error if something went wrong with an API request, communication would be the according state to hold this information.
+
+Examples:
+```
+isLoading:  true
+errors:     ['Something went wrong!']
+```
+
+### Session
+State that might not necessarily be displayed to the user, but is still important for the app to function correctly. If you're keeping an API token for your user in their local storage you could load it into the session state while the app is initializing.
+
+Examples:
+```
+userId:      13
+auth_token:  abc123_abc
+```
+
+### Location / Router
+Depending on your app this state might not be in your redux store. However, as a single source of truth we recommend that you use a routing solution that operates tightly with redux like [redux-first-router](https://github.com/faceyspacey/redux-first-router).
+
+Examples:
+```
+hash:       '#chapter-1'
+query:      'sort=asc'
+```
