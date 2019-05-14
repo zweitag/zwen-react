@@ -1,4 +1,3 @@
-import ejs from 'ejs';
 import Generator from 'yeoman-generator';
 
 import * as r from '../constants/regex';
