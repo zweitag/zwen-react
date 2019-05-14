@@ -1,0 +1,14 @@
+import * as t from '@/actions/types';
+
+import middleware from './<%=MIDDLEWARE_NAME%>';
+
+describe('middleware/<%=MIDDLEWARE_NAME%>', () => {
+<%=indent()%>it('should call next with the original action', () => {
+<%=indent(2)%>const next = jest.fn();
+<%=indent(2)%>const action = { type: 'test/TEST_ACTION' };
+
+<%=indent(2)%>middleware()(next)(action);
+
+<%=indent(2)%>expect(next).toBeCalledWith(mockAction);
+<%=indent()%>});
+});

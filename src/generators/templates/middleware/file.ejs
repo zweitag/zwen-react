@@ -1,0 +1,11 @@
+import * as t from '@/actions/types';
+
+export default store => next => (action = {}) => {
+<%=indent()%>const { type, payload } = action;
+
+<%=indent()%>if (type === t.MY_ACTION) {
+
+<%=indent()%>}
+
+<%=indent()%>next(action);
+}

@@ -110,5 +110,14 @@ describe('utils/addToFile', () => {
 
       expect(result).toBe('import test from test\n\nexport a--\nexport b--\nexport c--');
     });
+
+    it('should check for sections to keep at the beginning of a file', () => {
+      file = '/* zwen-keep-start */KEEP/* zwen-keep-end */\n' + file;
+
+      const result = addToFile(file, addition, selector);
+
+      expect(result)
+        .toBe('/* zwen-keep-start */KEEP/* zwen-keep-end */\nimport test from test\n\nexport a\nexport b\nexport c');
+    });
   });
 });
