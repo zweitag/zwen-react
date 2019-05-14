@@ -1,10 +1,10 @@
 import ejs from 'ejs';
 import Generator from 'yeoman-generator';
 
+import * as r from '../constants/regex';
+import * as t from '../constants/templateStrings';
 import { FileToWrite, GeneratorOptions, Zwenerator } from '../types';
 import { addToFile } from '../utils';
-import * as r from './constants/regex';
-import * as t from './constants/templateStrings';
 
 const PATH_PREFIX = 'actions';
 const CREATORS_FILE_NAME = 'creators';

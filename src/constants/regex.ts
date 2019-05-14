@@ -1,4 +1,4 @@
-import config from '../../config';
+import config from '../config';
 
 const escapeRegEx = (regexStr: string) => regexStr.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 const indent = escapeRegEx(config.indent);
@@ -29,4 +29,8 @@ export const selectCombinedReducers = new RegExp(
 export const selectLastNewCombinedReducer = new RegExp(
   `(?<=combineReducers\\({\\n( {2}\\w+,\\n)*) {2}\\w+,\\n$`,
   'g',
+);
+export const zwenKeepSection = new RegExp(
+  '^\\/\\* zwen-keep-start \\*\\/.*\\/\\* zwen-keep-end \\*\\/',
+  'gs',
 );

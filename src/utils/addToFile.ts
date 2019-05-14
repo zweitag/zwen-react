@@ -10,6 +10,7 @@
     needs a separator of \nXX
     and a replaceStringSeparator of XX
 */
+import * as r from '../constants/regex';
 import { AdditionOptions } from '../types';
 
 const defaultOptions: AdditionOptions = {
@@ -35,13 +36,21 @@ export default (
     return file;
   }
 
+  let keptSection = '';
+  const keptSectionMatch = file.match(r.zwenKeepSection);
+
+  if (keptSectionMatch) {
+    keptSection = keptSectionMatch[0];
+    file = file.replace(keptSection, '');
+  }
+
   const selection = file.match(selector) || [];
   const stringToReplace = selection.join(opts.replaceStringSeparator);
 
   if (stringToReplace === '') {
     const additionWithAffixes = opts.prefixForAll + addition + opts.suffixForAll;
 
-    return file + additionWithAffixes + opts.appendixIfNew;
+    return keptSection + file + additionWithAffixes + opts.appendixIfNew;
   }
 
   const stringToInsert = selection
@@ -50,5 +59,5 @@ export default (
     .sort()
     .join(opts.separator);
 
-  return file.replace(stringToReplace, stringToInsert);
+  return keptSection + file.replace(stringToReplace, stringToInsert);
 };
