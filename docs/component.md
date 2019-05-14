@@ -44,7 +44,7 @@ const MyComponent = ({ isMenuOpen, onOpen }) => (
 
 MyComponent.propTypes = {
   isMenuOpen: PropTypes.bool,
-  onOpen: PropTypes.func,
+  onOpen: PropTypes.func.isRequired,
 };
 
 MyComponent.defaultProps = {
@@ -53,6 +53,7 @@ MyComponent.defaultProps = {
 
 export default connect(mapStateToProps, mapDispatchToProps)(MyComponent);
 ```
+
 Sometimes a component needs to have access to certain lifecycle methods. In this case it's signature looks like this:
 ```
 // => components/myFeature/MyOtherComponent.js

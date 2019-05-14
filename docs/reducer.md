@@ -37,10 +37,4 @@ export default combineReducers({
 export * from './myReducer';
 ```
 
-All reducer folders get accessed by the top level *index.js* file
-
-```
-// => reducers/index.js
-
-export { default as myFeature } from './myFeature';
-```
+You should avoid creating reducers at the top level like `reducers/myReducer.js`. As your app grows your structure quickly will get out of hands, so it is a good idea to start organizing it from the very beginning. Read more about this in the "Organizing State" chapter of our [introduction](introduction.md).
