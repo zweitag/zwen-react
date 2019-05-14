@@ -1,7 +1,7 @@
 {
   "name": "zwen-react",
   "description": "Code generator CLI for projects using react and redux",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "author": "Zweitag GmbH @zweitag",
   "contributors": [
     "Alex Kott <alexander.kott@zweitag.de>",
@@ -24,7 +24,7 @@
   "repository": "https://github.com/zweitag/zwen-react",
   "bugs": "https://github.com/zweitag/zwen-react/issues",
   "dependencies": {
-    "@babel/polyfill": "^7.4.0",
+    "@babel/polyfill": "^7.4.4",
     "camel-case": "^3.0.0",
     "chalk": "^2.4.2",
     "constant-case": "^2.0.0",
@@ -35,22 +35,22 @@
     "yeoman-generator": "^3.2.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.4.0",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.4.0",
-    "@babel/preset-env": "^7.4.2",
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
     "@babel/preset-typescript": "^7.3.3",
     "@types/camelcase": "^5.2.0",
     "@types/ejs": "^2.6.3",
     "@types/jest-matchers": "^20.0.2",
     "@types/mem-fs": "^1.1.2",
     "@types/mem-fs-editor": "^5.1.1",
-    "@types/node": "^11.12.2",
-    "@types/yeoman-generator": "^3.1.1",
-    "jest": "^24.5.0",
-    "tslint": "^5.15.0",
-    "typescript": "^3.4.1"
+    "@types/node": "^11.13.10",
+    "@types/yeoman-generator": "^3.1.2",
+    "jest": "^24.8.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   },
   "scripts": {
     "babel": "babel src -d lib --extensions .ts --copy-files --ignore src/**/*.test.js",
