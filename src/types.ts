@@ -39,6 +39,7 @@ export interface GeneratorOptions {
 
 export interface Zwenerator extends Generator {
   filesToWrite?: FileToWrite[];
+  srcDir?: string;            // path from .zwen file or 'src'
   destDir: string[];          // path elements leading from enclosing dir to the file
   destPath: string;           // path leading from enclosing dir to target directory
   topLevelPath: string;       // path leading to the enclosing directory
