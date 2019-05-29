@@ -11,6 +11,10 @@ export const selectExportsAll = new RegExp(
   'export \\*(.+?(?=export \\*|$))',
   'gs',
 );
+export const selectExportConstNames = new RegExp(
+  '(?<=\nexport const )\\w*',
+  'gs',
+);
 export const selectDefaultImports = new RegExp(
   'import \\w(.+?(?=import|$|\\n\\n))',
   'gs',
