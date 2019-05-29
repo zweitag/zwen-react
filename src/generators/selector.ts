@@ -71,7 +71,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
       fileSelectors.forEach(name => {
         this.existingSelectors.push({
           name,
-          path: filePath.replace(/\/\w*\.js/, ''),
+          path: filePath.replace(/\/\w*\.js/, '').replace(/\//g, ' › '),
           source: REDUCER_PATH_PREFIX,
         });
       });
@@ -79,7 +79,6 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   }
 
   async prompting() {
-    const selectors = ['', 'One', 'Two', 'OtherSelector', 'MySelector', 'What'];
     const answers: string[] = [];
     logger.log('Which selectors do you want to use?');
 
