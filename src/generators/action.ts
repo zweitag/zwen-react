@@ -33,9 +33,9 @@ export default class ActionGenerator extends Generator implements Zwenerator {
 
   async prompting() {
     const answer = await this.prompt({
-      message: 'Create an action type with the same name?',
-      name: 'withActionType',
       type: 'confirm',
+      name: 'withActionType',
+      message: 'Create an action type with the same name?',
     });
 
     this.withActionType = answer.withActionType;

@@ -3,4 +3,5 @@ export const registeredGenerators = [
   'component',
   'middleware',
   'reducer',
+  'selector',
 ];
