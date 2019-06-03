@@ -19,6 +19,7 @@ interface existingSelector {
   source: 'reducers' | 'selectors';
   path: string;
   name: string;
+  displayName: string;
 }
 
 interface SelectorZwenerator extends Zwenerator {
@@ -69,10 +70,12 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
       const fileSelectors = file.match(r.selectExportConstNames) || [];
 
       fileSelectors.forEach(name => {
+        const path = filePath.replace(/\/\w*\.js/, '').replace(/\//g, ' › ');
         this.existingSelectors.push({
           name,
-          path: filePath.replace(/\/\w*\.js/, '').replace(/\//g, ' › '),
+          path,
           source: REDUCER_PATH_PREFIX,
+          displayName: `${path} › ${name}`,
         });
       });
     }));
@@ -80,6 +83,8 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
 
   async prompting() {
     const answers: string[] = [];
+    let remainingExistingSelectors = this.existingSelectors;
+
     logger.log('Which selectors do you want to use?');
 
     const promptAnswer = async () => {
@@ -88,19 +93,20 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
         name: 'selector',
         message: '›',
         // autocomplete plugin requires this to be a promise
-        source: async (_: string[], input: string = '') => {
-          return fuzzy
+        source: async (_: string[], input: string = '') => (
+          fuzzy
             .filter(
               input,
-              this.existingSelectors,
-              { extract: (selector: existingSelector) => `${selector.path} › ${selector.name}` }
+              remainingExistingSelectors,
+              { extract: (selector: existingSelector) => selector.displayName }
             )
-            .map((result: FilterResult<existingSelector>) => result.string);
-        },
+            .map((result: FilterResult<existingSelector>) => result.string)
+        ),
       });
 
       if (selector) {
         answers.push(selector);
+        remainingExistingSelectors = remainingExistingSelectors.filter(s => s.displayName !== selector);
         await promptAnswer();
       }
     };
