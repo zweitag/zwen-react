@@ -13,12 +13,6 @@ import logger from '../logger';
 import { FileToWrite, GeneratorOptions, Zwenerator } from '../types';
 import addToFile from '../utils/addToFile';
 
-const readFile = promisify(fs.readFile);
-
-const PATH_PREFIX = 'selectors';
-const REDUCER_PATH_PREFIX = 'reducers';
-const POSSIBLE_STATE_NAMES = 'abcdefghijklmnopqrstuvwxyz'.split('');
-
 interface ExistingSelector {
   source: 'reducers' | 'selectors';
   path: string;
@@ -32,6 +26,15 @@ interface SelectorZwenerator extends Zwenerator {
   existingSelectors: ExistingSelector[];
   chosenSelectors: ExistingSelector[];
 }
+
+const readFile = promisify(fs.readFile);
+
+const PATH_PREFIX = 'selectors';
+const REDUCER_PATH_PREFIX = 'reducers';
+const POSSIBLE_STATE_NAMES = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+const defaultExistingSelector: ExistingSelector =
+  { source: 'reducers', path: '', name: '', displayName: '' };
 
 export default class SelectorGenerator extends Generator implements SelectorZwenerator {
   filesToWrite: FileToWrite[] = [];
@@ -90,7 +93,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   async prompting() {
     const DONE_CMD = 'done!';
     const doneSelector: ExistingSelector = {
-      name: '', path: '', source: 'reducers',
+      ...defaultExistingSelector,
       displayName: DONE_CMD,
     };
     const answers: string[] = [];
@@ -124,7 +127,9 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
 
     await promptAnswer();
 
-    this.chosenSelectors = this.existingSelectors.filter(({ displayName }) => answers.includes(displayName));
+    this.chosenSelectors = answers.map(
+      answer => this.existingSelectors.find(({ displayName }) => answer === displayName) || defaultExistingSelector,
+    );
   }
 
   configuring() {
@@ -153,12 +158,21 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   }
 
   addSelector() {
-    // 1. select file contents (import createSelector)
-    // 2. update imports
+    const importCreateSelector = t.importNamedFrom('createSelector', 'reselect') + '\n';
     const selectorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/selector.ejs`));
     const newSelector = ejs.render(selectorTemplate, this.templateConfig);
-    console.log(newSelector);
-    // 3. add to file (new selector)
+
+    // read
+    const selectorsFile = this.fs.read(`${this.absolutePath}.js`, { defaults: importCreateSelector });
+
+    // TODO: update imports
+    // update
+    const updateOptions = {
+      separator: '\n\n',
+    };
+    const updatedFile = addToFile(selectorsFile, newSelector, r.selectExports, updateOptions);
+    // write
+    this.filesToWrite.push({ name: `${this.absolutePath}.js`, content: updatedFile });
   }
 
   addSelectorTest() {
