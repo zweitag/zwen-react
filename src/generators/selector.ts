@@ -1,10 +1,10 @@
 import fs from 'fs';
-import path from 'path';
-import { promisify } from 'util';
 import read from 'fs-readdir-recursive';
-import Generator from 'yeoman-generator';
 import fuzzy, { FilterResult } from 'fuzzy';
 import autocomplete from 'inquirer-autocomplete-prompt';
+import path from 'path';
+import { promisify } from 'util';
+import Generator from 'yeoman-generator';
 
 import * as r from '../constants/regex';
 import * as t from '../constants/templateStrings';
@@ -17,7 +17,7 @@ const readFile = promisify(fs.readFile);
 const PATH_PREFIX = 'selectors';
 const REDUCER_PATH_PREFIX = 'reducers';
 
-interface existingSelector {
+interface ExistingSelector {
   source: 'reducers' | 'selectors';
   path: string;
   name: string;
@@ -27,8 +27,8 @@ interface existingSelector {
 interface SelectorZwenerator extends Zwenerator {
   srcDir: string;
   topLevelReducerPath: string;
-  existingSelectors: existingSelector[];
-  chosenSelectors: existingSelector[];
+  existingSelectors: ExistingSelector[];
+  chosenSelectors: ExistingSelector[];
 }
 
 export default class SelectorGenerator extends Generator implements SelectorZwenerator {
@@ -42,8 +42,8 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   topLevelReducerPath: string;
   absolutePath: string;
   fileName: string;
-  existingSelectors: existingSelector[] = [];
-  chosenSelectors: existingSelector[] = [];
+  existingSelectors: ExistingSelector[] = [];
+  chosenSelectors: ExistingSelector[] = [];
 
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
@@ -66,7 +66,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
       (name: string) =>
         !name.startsWith('.') &&
         !name.endsWith('index.js') &&
-        !name.endsWith('test.js')
+        !name.endsWith('test.js'),
     );
 
     await Promise.all(reducerFiles.map(async filePath => {
@@ -74,12 +74,12 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
       const fileSelectors = file.match(r.selectExportConstNames) || [];
 
       fileSelectors.forEach(name => {
-        const path = filePath.replace(/\/\w*\.js/, '').replace(/\//g, ' › ');
+        const displayedPath = filePath.replace(/\/\w*\.js/, '').replace(/\//g, ' › ');
         this.existingSelectors.push({
           name,
-          path,
+          path: displayedPath,
           source: REDUCER_PATH_PREFIX,
-          displayName: `${path} › ${name}`,
+          displayName: `${displayedPath} › ${name}`,
         });
       });
     }));
@@ -87,7 +87,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
 
   async prompting() {
     const DONE_CMD = 'done!';
-    const doneSelector: existingSelector = {
+    const doneSelector: ExistingSelector = {
       name: '', path: '', source: 'reducers',
       displayName: DONE_CMD,
     };
@@ -107,9 +107,9 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
             .filter(
               input,
               remainingExistingSelectors,
-              { extract: (selector: existingSelector) => selector.displayName }
+              { extract: (s: ExistingSelector) => s.displayName },
             )
-            .map((result: FilterResult<existingSelector>) => result.string)
+            .map((result: FilterResult<ExistingSelector>) => result.string)
         ),
       });
 
@@ -134,7 +134,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
       const fileDefaults = index === 0 ? t.exportAllFromReducers() : '';
       const file = this.fs.read(`${currentPath}/index.js`, { defaults: fileDefaults });
       // update imports
-      let updatedFile = addToFile(file, t.exportAllFrom(subPath), r.selectExportsAll);
+      const updatedFile = addToFile(file, t.exportAllFrom(subPath), r.selectExportsAll);
 
       this.filesToWrite.push({ name: `${currentPath}/index.js`, content: updatedFile });
 

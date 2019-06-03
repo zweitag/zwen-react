@@ -5,6 +5,6 @@
     "interface-name": false,
     "member-access": false,
     "quotemark": [true, "single"],
-    "object-literal-sort-keys": false,
+    "object-literal-sort-keys": false
   }
 }

@@ -31,5 +31,5 @@ export const exportDefaultCombineReducers = () =>
 // SELECTORS
 export const exportAllFromReducers = () =>
   `/* zwen-keep-start */\n` +
-  `export * from '@/reducers';\n`+
+  `export * from '@/reducers';\n` +
   `/* zwen-keep-end */\n\n`;
