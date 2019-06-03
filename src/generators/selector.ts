@@ -7,8 +7,10 @@ import fuzzy, { FilterResult } from 'fuzzy';
 import autocomplete from 'inquirer-autocomplete-prompt';
 
 import * as r from '../constants/regex';
+import * as t from '../constants/templateStrings';
 import logger from '../logger';
 import { FileToWrite, GeneratorOptions, Zwenerator } from '../types';
+import addToFile from '../utils/addToFile';
 
 const readFile = promisify(fs.readFile);
 
@@ -26,6 +28,7 @@ interface SelectorZwenerator extends Zwenerator {
   srcDir: string;
   topLevelReducerPath: string;
   existingSelectors: existingSelector[];
+  chosenSelectors: existingSelector[];
 }
 
 export default class SelectorGenerator extends Generator implements SelectorZwenerator {
@@ -40,6 +43,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   absolutePath: string;
   fileName: string;
   existingSelectors: existingSelector[] = [];
+  chosenSelectors: existingSelector[] = [];
 
   constructor(args: string[], options: GeneratorOptions) {
     super(args, options);
@@ -118,6 +122,27 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
 
     await promptAnswer();
 
-    console.log(answers);
+    this.chosenSelectors = this.existingSelectors.filter(({ displayName }) => answers.includes(displayName));
+  }
+
+  addExports() {
+    const destDirWithFileName = this.destDir.concat(this.fileName);
+    let currentPath = `${this.topLevelPath}`;
+
+    destDirWithFileName.forEach((subPath: string, index: number) => {
+      // read
+      const fileDefaults = index === 0 ? t.exportAllFromReducers() : '';
+      const file = this.fs.read(`${currentPath}/index.js`, { defaults: fileDefaults });
+      // update imports
+      let updatedFile = addToFile(file, t.exportAllFrom(subPath), r.selectExportsAll);
+
+      this.filesToWrite.push({ name: `${currentPath}/index.js`, content: updatedFile });
+
+      currentPath += `/${subPath}`;
+    });
+  }
+
+  writing() {
+    this.filesToWrite.forEach(({ name, content }) => this.fs.write(name, `${content.trim()}\n`));
   }
 }
