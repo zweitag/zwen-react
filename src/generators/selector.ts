@@ -82,10 +82,15 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   }
 
   async prompting() {
+    const DONE_CMD = 'done!';
+    const doneSelector: existingSelector = {
+      name: '', path: '', source: 'reducers',
+      displayName: DONE_CMD,
+    };
     const answers: string[] = [];
-    let remainingExistingSelectors = this.existingSelectors;
+    let remainingExistingSelectors = [...this.existingSelectors, doneSelector];
 
-    logger.log('Which selectors do you want to use?');
+    logger.selectorPrompt(DONE_CMD);
 
     const promptAnswer = async () => {
       const { selector } = await this.prompt({
@@ -104,7 +109,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
         ),
       });
 
-      if (selector) {
+      if (selector && selector !== DONE_CMD) {
         answers.push(selector);
         remainingExistingSelectors = remainingExistingSelectors.filter(s => s.displayName !== selector);
         await promptAnswer();
