@@ -1,3 +1,4 @@
+import ejs from 'ejs';
 import fs from 'fs';
 import read from 'fs-readdir-recursive';
 import fuzzy, { FilterResult } from 'fuzzy';
@@ -16,6 +17,7 @@ const readFile = promisify(fs.readFile);
 
 const PATH_PREFIX = 'selectors';
 const REDUCER_PATH_PREFIX = 'reducers';
+const POSSIBLE_STATE_NAMES = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 interface ExistingSelector {
   source: 'reducers' | 'selectors';
@@ -125,11 +127,19 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
     this.chosenSelectors = this.existingSelectors.filter(({ displayName }) => answers.includes(displayName));
   }
 
+  configuring() {
+    this.templateConfig = {
+      SELECTOR_NAME: this.fileName,
+      USED_SELECTORS: this.chosenSelectors.map(s => s.name),
+      STATE_NAMES: POSSIBLE_STATE_NAMES.slice(0, this.chosenSelectors.length).join(', '),
+      indent: (amount = 1) => this.indent.repeat(amount),
+    };
+  }
+
   addExports() {
-    const destDirWithFileName = this.destDir.concat(this.fileName);
     let currentPath = `${this.topLevelPath}`;
 
-    destDirWithFileName.forEach((subPath: string, index: number) => {
+    this.destDir.forEach((subPath: string, index: number) => {
       // read
       const fileDefaults = index === 0 ? t.exportAllFromReducers() : '';
       const file = this.fs.read(`${currentPath}/index.js`, { defaults: fileDefaults });
@@ -140,6 +150,20 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
 
       currentPath += `/${subPath}`;
     });
+  }
+
+  addSelector() {
+    // 1. select file contents (import createSelector)
+    // 2. update imports
+    const selectorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/selector.ejs`));
+    const newSelector = ejs.render(selectorTemplate, this.templateConfig);
+    console.log(newSelector);
+    // 3. add to file (new selector)
+  }
+
+  addSelectorTest() {
+    // 1. select tests
+    // 2. add to file (new selector test)
   }
 
   writing() {

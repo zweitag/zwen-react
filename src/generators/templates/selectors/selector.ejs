@@ -1,0 +1,8 @@
+export const <%=SELECTOR_NAME%> = createSelector(
+<%=indent()%>[
+<%_ USED_SELECTORS.forEach(usedSelector => { _%>
+<%=indent(2)%><%= usedSelector %>,
+<%_ }); _%>
+<%=indent()%>],
+<%=indent()%>(<%=STATE_NAMES%>) => {}
+);
