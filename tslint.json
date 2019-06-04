@@ -2,8 +2,9 @@
   "extends": "tslint:recommended",
   "rules": {
     "arrow-parens": [true, "ban-single-arg-parens"],
-    "interface-name":false,
-    "member-access":false,
-    "quotemark": [true, "single"]
+    "interface-name": false,
+    "member-access": false,
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false
   }
 }

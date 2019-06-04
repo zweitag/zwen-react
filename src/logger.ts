@@ -53,4 +53,7 @@ export default {
       log(comment);
     }
   },
+  selectorPrompt(command: string) {
+    log(`Which selectors do you want to use?\nType ${gray.underline(command)} when you're done.`);
+  },
 };

@@ -1,0 +1,8 @@
+<%=indent()%>describe('<%=SELECTOR_NAME%>', () => {
+<%=indent(2)%>it('should return the correct values', () => {
+<%=indent(3)%>const state = {};
+<%=indent(3)%>const result = s.<%=SELECTOR_NAME%>(state);
+
+<%=indent(3)%>expect(result).toBe('myResult');
+<%=indent(2)%>});
+<%=indent()%>});

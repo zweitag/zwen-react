@@ -16,14 +16,18 @@ export const importAllAsFrom = (as: string, from: string) =>
 export const importNamedFrom = (name: string, from: string) =>
   `import { ${name} } from '${from}';\n`;
 
-// ACTIONS
-export const creatorTestHead = (path: string) =>
-  `import * as t from '@/actions/types';\n` +
-  `import * as actions from './creators';\n\n` +
-  `describe('actions/${path}', () => {\n`;
+export const describeTestStart = (path: string) =>
+  `describe('${path}', () => {\n`;
 
-export const creatorTestFoot = () => '});\n';
+export const describeTestEnd = () =>
+  `});\n`;
 
 // REDUCERS
 export const exportDefaultCombineReducers = () =>
   'export default combineReducers({\n';
+
+// SELECTORS
+export const exportAllFromReducers = () =>
+  `/* zwen-keep-start */\n` +
+  `export * from '@/reducers';\n` +
+  `/* zwen-keep-end */\n\n`;

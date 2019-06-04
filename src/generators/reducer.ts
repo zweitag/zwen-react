@@ -52,8 +52,8 @@ export default class ReducerGenerator extends Generator implements Zwenerator {
 
     destDirWithFileName.forEach((subPath: string) => {
       // read
-      const importWithNewLine = t.importNamedFrom('combineReducers', 'redux') + '\n';
-      const file = this.fs.read(`${currentPath}/index.js`, { defaults: importWithNewLine });
+      const fileHead = t.importNamedFrom('combineReducers', 'redux') + '\n';
+      const file = this.fs.read(`${currentPath}/index.js`, { defaults: fileHead });
       // update imports
       let updatedFile = addToFile(file, t.importDefaultFrom(subPath, `./${subPath}`), r.selectDefaultImports);
 

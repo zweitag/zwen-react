@@ -58,7 +58,6 @@ export default class ComponentGenerator extends Generator implements Zwenerator 
   }
 
   writing() {
-    const destPath = `${this.absolutePath}`;
     const templateName = this.classComp ? 'classComp' : 'component';
     const componentName = this.fileName.toPascalCase();
     this.fs.copyTpl(
