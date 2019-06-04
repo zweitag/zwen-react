@@ -80,12 +80,12 @@ export default class ActionGenerator extends Generator implements Zwenerator {
   }
 
   addActionCreator() {
-    const importStatement = t.importAllAsFrom('t', '@/actions/types') + '\n';
     const creatorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.ejs`));
     const newCreator = ejs.render(creatorTemplate, this.templateConfig);
 
     // read
-    const creatorsFile = this.fs.read(`${this.absolutePath}/creators.js`, { defaults: importStatement });
+    const fileHead = t.importAllAsFrom('t', '@/actions/types') + '\n';
+    const creatorsFile = this.fs.read(`${this.absolutePath}/creators.js`, { defaults: fileHead });
     // update
     const updateOptions = {
       separator: '\n\n',
@@ -98,13 +98,16 @@ export default class ActionGenerator extends Generator implements Zwenerator {
   addActionCreatorTest() {
     const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/creator.test.ejs`));
     const newTest = ejs.render(testTemplate, this.templateConfig);
-    const fileDefaults = t.creatorTestHead(this.destPath);
 
     // read
-    const testFile = this.fs.read(`${this.absolutePath}/creators.test.js`, { defaults: fileDefaults });
+    const fileHead =
+      t.importAllAsFrom('t', '@/actions/types') +
+      t.importAllAsFrom('actions', './creators') + '\n' +
+      t.describeTestStart(`actions/${this.destPath}`);
+    const testFile = this.fs.read(`${this.absolutePath}/creators.test.js`, { defaults: fileHead });
     // update
     const updateOptions = {
-      appendixIfNew: t.creatorTestFoot(),
+      appendixIfNew: t.describeTestEnd(),
       replaceStringSeparator: '  ',
       separator: '\n\n  ',
     };

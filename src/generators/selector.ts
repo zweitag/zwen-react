@@ -33,8 +33,9 @@ const PATH_PREFIX = 'selectors';
 const REDUCER_PATH_PREFIX = 'reducers';
 const POSSIBLE_STATE_NAMES = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-const defaultExistingSelector: ExistingSelector =
-  { source: 'reducers', path: '', name: '', displayName: '' };
+const defaultExistingSelector: ExistingSelector = {
+  source: 'reducers', path: '', name: '', displayName: '',
+};
 
 export default class SelectorGenerator extends Generator implements SelectorZwenerator {
   filesToWrite: FileToWrite[] = [];
@@ -135,7 +136,7 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   configuring() {
     this.templateConfig = {
       SELECTOR_NAME: this.fileName,
-      USED_SELECTORS: this.chosenSelectors.map(s => s.name),
+      USED_SELECTORS: this.chosenSelectors.map(s => s.source === 'reducers' ? `s.${s.name}` : s.name),
       STATE_NAMES: POSSIBLE_STATE_NAMES.slice(0, this.chosenSelectors.length).join(', '),
       indent: (amount = 1) => this.indent.repeat(amount),
     };
@@ -146,11 +147,11 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
 
     this.destDir.forEach((subPath: string, index: number) => {
       // read
-      const fileDefaults = index === 0 ? t.exportAllFromReducers() : '';
-      const file = this.fs.read(`${currentPath}/index.js`, { defaults: fileDefaults });
-      // update imports
+      const fileHead = index === 0 ? t.exportAllFromReducers() : '';
+      const file = this.fs.read(`${currentPath}/index.js`, { defaults: fileHead });
+      // update
       const updatedFile = addToFile(file, t.exportAllFrom(subPath), r.selectExportsAll);
-
+      // write
       this.filesToWrite.push({ name: `${currentPath}/index.js`, content: updatedFile });
 
       currentPath += `/${subPath}`;
@@ -158,14 +159,14 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   }
 
   addSelector() {
-    const importCreateSelector = t.importNamedFrom('createSelector', 'reselect') + '\n';
     const selectorTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/selector.ejs`));
     const newSelector = ejs.render(selectorTemplate, this.templateConfig);
 
     // read
-    const selectorsFile = this.fs.read(`${this.absolutePath}.js`, { defaults: importCreateSelector });
-
-    // TODO: update imports
+    const fileHead =
+      t.importNamedFrom('createSelector', 'reselect') + '\n' +
+      t.importAllAsFrom('s', '@/reducers') + '\n';
+    const selectorsFile = this.fs.read(`${this.absolutePath}.js`, { defaults: fileHead });
     // update
     const updateOptions = {
       separator: '\n\n',
@@ -176,8 +177,23 @@ export default class SelectorGenerator extends Generator implements SelectorZwen
   }
 
   addSelectorTest() {
-    // 1. select tests
-    // 2. add to file (new selector test)
+    const testTemplate = this.fs.read(this.templatePath(`${PATH_PREFIX}/selector.test.ejs`));
+    const newTest = ejs.render(testTemplate, this.templateConfig);
+
+    // read
+    const fileHead =
+      t.importAllAsFrom('s', `./${this.destPath}`) + '\n' +
+      t.describeTestStart(`selectors/${this.destPath}`);
+    const testFile = this.fs.read(`${this.absolutePath}.test.js`, { defaults: fileHead });
+    // update
+    const updateOptions = {
+      appendixIfNew: t.describeTestEnd(),
+      replaceStringSeparator: '  ',
+      separator: '\n\n  ',
+    };
+    const updatedFile = addToFile(testFile, newTest, r.selectDescribes, updateOptions);
+
+    this.filesToWrite.push({ name: `${this.absolutePath}.test.js`, content: updatedFile });
   }
 
   writing() {
