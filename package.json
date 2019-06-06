@@ -1,7 +1,7 @@
 {
   "name": "zwen-react",
   "description": "Code generator CLI for projects using react and redux",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "author": "Zweitag GmbH @zweitag",
   "contributors": [
     "Alex Kott <alexander.kott@zweitag.de>",
